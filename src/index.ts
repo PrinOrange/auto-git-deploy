@@ -1,15 +1,24 @@
-import envSchema from "env-schema";
+import express from "express";
+import join from "url-join";
+import { loadConfigFromFile } from "./config";
+import { assignWebhookRouters } from "./server";
+import { ExecuteActions } from "./action";
 
-const schema = {
-	type: "object",
-	required: ["WEBHOOK_LISTENING_PORT", "WEBHOOK_SECRET"],
-	properties: {
-		WEBHOOK_LISTENING_PORT: { type: "string", default: "3000" },
-		WEBHOOK_SECRET: { type: "string", default: null },
-	},
+const { port, secret, payloadURL, actions } = loadConfigFromFile(
+	"git-auto-deploy.json",
+);
+const localhostAddress = join(`http://localhost:${port}`, payloadURL);
+
+const main = async () => {
+	const server = express();
+
+	assignWebhookRouters(server, payloadURL, secret, (payload) => {
+		ExecuteActions(payload, actions);
+	});
+
+	server.listen(port, () => {
+		console.log(`Server started at ${localhostAddress}`);
+	});
 };
 
-const environmentVariables = envSchema({ schema, dotenv: true });
-
-console.log("Port Number:", environmentVariables.WEBHOOK_LISTENING_PORT);
-console.log("Secret:", environmentVariables.WEBHOOK_SECRET);
+main();

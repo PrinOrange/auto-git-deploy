@@ -34,7 +34,7 @@ export const assignWebhookRouters = (
 	// Assign routers to server.
 	server.post(
 		payloadURL,
-		secret ? validateSignature : (req, res, next) => next(),
+		secret ? validateSignature : (_req, _res, next) => next(),
 		applyPayload,
 	);
 };
