@@ -1,29 +1,40 @@
 import bodyParser from "body-parser";
-import express from "express";
+import { Express, Handler } from "express";
 import { verifyGithubWebhook } from "./crypto";
 import { GithubWebhookPayload } from "./types/payload.type";
 
-const app = express();
-app.use(bodyParser.json());
-
-export const setWebhookServer = (
-	port: number,
+export const assignWebhookRouters = (
+	server: Express,
 	payloadURL: string,
-	secret: string,
+	secret: string | null = null,
+	callback: (payload: GithubWebhookPayload) => void,
 ) => {
-	app.post(payloadURL, (req, res, next) => {
-		const signature = req.headers["x-hub-signature-256"]?.toString() ?? "";
-		const payload: GithubWebhookPayload = req.body;
+	server.use(bodyParser.json());
 
-		if (signature === "" || !verifyGithubWebhook(secret, payload, signature)) {
-			res.status(401).send("Unauthorized");
+	// Router for validate signature from github webhook.
+	const validateSignature: Handler = (req, res, next) => {
+		const signature = req.headers["x-hub-signature-256"]?.toString() || "";
+		const payload = req.body;
+		if (!verifyGithubWebhook(secret!, payload, signature)) {
+			console.error("Invalid webhook signature detected.");
+			res.status(401).json({ error: "Unauthorized: Invalid signature" });
 			return;
 		}
+		next();
+	};
 
-		payload.pusher;
-	});
+	// Apply payload to callback function.
+	const applyPayload: Handler = (req, res) => {
+		const payload = req.body as GithubWebhookPayload;
+		console.log(`Webhook received at ${payloadURL} from ${req.ip}`);
+		callback(payload);
+		res.status(200).send("Success");
+	};
 
-	app.listen(port, () => {
-		console.log(`Server is running on port ${port}`);
-	});
+	// Assign routers to server.
+	server.post(
+		payloadURL,
+		secret ? validateSignature : (req, res, next) => next(),
+		applyPayload,
+	);
 };

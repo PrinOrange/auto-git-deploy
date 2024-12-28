@@ -16,6 +16,7 @@
 	"dependencies": {
 		"@octokit/webhooks": "^13.4.1",
 		"body-parser": "^1.20.3",
+		"env-schema": "^6.0.0",
 		"express": "^4.21.2",
 		"lodash": "^4.17.21",
 		"yargs": "^17.7.2"

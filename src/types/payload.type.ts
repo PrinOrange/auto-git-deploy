@@ -13,8 +13,8 @@ export interface GithubWebhookRequestHeader {
 	"x-github-hook-id": string;
 	"x-github-hook-installation-target-id": string;
 	"x-github-hook-installation-target-type": string;
-	"x-hub-signature"?: string;
-	"x-hub-signature-256"?: string;
+	"x-hub-signature"?: string; // For sha1 verification
+	"x-hub-signature-256"?: string; // For sha256 verification
 }
 
 export interface GithubWebhookPayload {

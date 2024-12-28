@@ -1,48 +1,15 @@
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
+import envSchema from "env-schema";
 
-interface Args {
-	repo: string;
-	port: number;
-	secret: string;
-}
+const schema = {
+	type: "object",
+	required: ["WEBHOOK_LISTENING_PORT", "WEBHOOK_SECRET"],
+	properties: {
+		WEBHOOK_LISTENING_PORT: { type: "string", default: "3000" },
+		WEBHOOK_SECRET: { type: "string", default: null },
+	},
+};
 
-const argv = yargs(hideBin(process.argv))
-	.scriptName("auto-git-deploy")
-	.usage("$0 [args]")
-	.option("repo", {
-		alias: "r",
-		type: "string",
-		demandOption: true,
-		description: "GitHub remote repository URL (required)",
-	})
-	.option("port", {
-		alias: "p",
-		type: "number",
-		default: 3300,
-		description: "Port number for the server (optional, default: 3300)",
-	})
-	.option("secret", {
-		alias: "s",
-		type: "string",
-		default: "",
-		description: "Secret token for authentication (optional, default: empty)",
-	})
-	.check((argv) => {
-		if (
-			!/^(https?:\/\/|git@)github\.com[/:][\w\-]+\/[\w\-]+(\.git)?$/.test(
-				argv.repo,
-			)
-		) {
-			throw new Error("Invalid repository URL. It must start with 'https'.");
-		}
-		if (argv.port <= 0) {
-			throw new Error("Port must be a positive number.");
-		}
-		return true;
-	})
-	.help().argv as Args;
+const environmentVariables = envSchema({ schema, dotenv: true });
 
-console.log("GitHub Repository URL:", argv.repo);
-console.log("Port Number:", argv.port);
-console.log("Secret:", argv.secret || "No secret provided");
+console.log("Port Number:", environmentVariables.WEBHOOK_LISTENING_PORT);
+console.log("Secret:", environmentVariables.WEBHOOK_SECRET);
