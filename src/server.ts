@@ -16,12 +16,42 @@ export const assignWebhookRouters = (server: Express, callback: (payload: Github
 
 	// Middleware for logging webhook information.
 	const logWebhook: Handler = (req, _res, next) => {
+		const header = req.headers as unknown as GithubWebhookRequestHeader;
 		const payload = req.body as GithubWebhookPayload;
 
-		serverOutputLogger.info(`Webhook received: Received Push update: ${payload.commits}`);
+		serverOutputLogger.info(`Webhook received: Event: ${header["x-github-event"]}`);
+		serverOutputLogger.info(`Webhook received: Delivery ID: ${header["x-github-delivery"]}`);
+		serverOutputLogger.info(`Webhook received: Webhook ID: ${header["x-github-hook-id"]}`);
+		serverOutputLogger.info(`Webhook received: Received update: ${payload.commits}`);
 		serverOutputLogger.info(`Webhook received: On reference: ${payload.ref}`);
 		serverOutputLogger.info(`Webhook received: By: ${payload.pusher.name}`);
 
+		next();
+	};
+
+	// Middleware for validating content type of webhook.
+	const validateContentType: Handler = (req, res, next) => {
+		const header = req.headers as unknown as GithubWebhookRequestHeader;
+		if (header["content-type"] !== "application/json") {
+			serverOutputLogger.error(`Content-Type of webhook: ${header["content-type"]} is not supported.`);
+			serverOutputLogger.error(`So this push event will be ignored.`);
+
+			res.status(503).json({ error: "Unsupported Content-Type, please use application/json." });
+			return;
+		}
+		next();
+	};
+
+	// Middleware for validating event type of webhook.
+	const validateEvent: Handler = (req, res, next) => {
+		const header = req.headers as unknown as GithubWebhookRequestHeader;
+		if (header["x-github-event"] !== "push") {
+			serverOutputLogger.error(`Event ${header["x-github-event"]} is not supported. Only push event is supported.`);
+			serverOutputLogger.error(`So this push event will be ignored.`);
+
+			res.status(503).json({ error: "Internal Github Event" });
+			return;
+		}
 		next();
 	};
 
@@ -49,12 +79,16 @@ export const assignWebhookRouters = (server: Express, callback: (payload: Github
 		const header = req.headers as unknown as GithubWebhookRequestHeader;
 		const signature = header["x-hub-signature-256"]?.toString() || "";
 		const payload = req.body;
-		if (!SECRET) {
-			next();
+		if (SECRET == null) {
+			next(); // Skip signature verification if secret is not set.
 			return;
 		}
-		if (!verifyGithubWebhook(SECRET!, payload, signature)) {
-			console.error("Invalid webhook signature detected.");
+		if (!verifyGithubWebhook(payload, signature)) {
+			serverOutputLogger.error("Received invalid signature from GitHub webhook.");
+			serverOutputLogger.error("Signature:", signature);
+			serverOutputLogger.error("Suspect this request is not from GitHub official webhook.");
+			serverOutputLogger.error("Or you should make sure the secret is correct.");
+			serverOutputLogger.error("So this push event will be ignored.");
 			res.status(401).json({ error: "Unauthorized: Invalid signature" });
 			return;
 		}
@@ -65,11 +99,10 @@ export const assignWebhookRouters = (server: Express, callback: (payload: Github
 	const applyPayload: Handler = (req, res) => {
 		const header = req.headers as unknown as GithubWebhookRequestHeader;
 		const payload = req.body as GithubWebhookPayload;
-		console.log(`Webhook received action "${header["x-github-event"]}" from ${payload.repository.full_name}`);
 		callback(payload);
 		res.status(200).send("Success");
 	};
 
 	// Assign routers to server.
-	server.post("/", logWebhook, validateBranch, validateSignature, applyPayload);
+	server.post("/", logWebhook, validateContentType, validateEvent, validateBranch, validateSignature, applyPayload);
 };

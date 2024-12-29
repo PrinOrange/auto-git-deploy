@@ -1,3 +1,14 @@
 {
-	"cSpell.words": ["Appender"]
+	"cSpell.words": [
+		"Appender",
+		"biomejs",
+		"dotenv",
+		"fullchain",
+		"libc",
+		"minimatch",
+		"nosniff",
+		"privkey",
+		"redir",
+		"shelljs"
+	]
 }
