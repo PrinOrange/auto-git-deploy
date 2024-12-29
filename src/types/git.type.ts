@@ -1,4 +1,4 @@
-export interface IGitState {
-	remoteUrl: string | null;
+export interface IGitStatus {
+	remoteURL: string | null;
 	currentBranch: string | null;
 }

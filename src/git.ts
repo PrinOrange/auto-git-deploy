@@ -1,16 +1,20 @@
 import { execSync } from "node:child_process";
-import type { IGitState } from "./types/git.type";
+import type { IGitStatus } from "./types/git.type";
 
-function getCurrentGitStatus(): IGitState | null {
+function getCurrentGitStatus(): IGitStatus | null {
 	try {
-		const remoteUrl = execSync("git config --get remote.origin.url", {
+		const rawRemoteURL = execSync("git config --get remote.origin.url", {
 			encoding: "utf-8",
 		}).trim();
-		const currentBranch = execSync("git rev-parse --abbrev-ref HEAD", {
+		const rawCurrentBranch = execSync("git rev-parse --abbrev-ref HEAD", {
 			encoding: "utf-8",
 		}).trim();
+
+		const remoteURL = rawRemoteURL.length > 0 ? rawRemoteURL : null;
+		const currentBranch = rawCurrentBranch.length > 0 ? rawCurrentBranch : null;
+
 		return {
-			remoteUrl,
+			remoteURL,
 			currentBranch,
 		};
 	} catch (error) {

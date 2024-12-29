@@ -45,10 +45,13 @@ export const assignWebhookRouters = (server: Express, callback: (payload: IGithu
 			}
 		} catch (error) {
 			res.status(400).json({ error: "Failed to parse x-www-form-urlencoded payload." });
-			serverOutputLogger.error(`Received webhook, but does not support its content-type ${header["content-type"]}`);
+			serverOutputLogger.error("Received webhook, but failed to parse its content-type");
 			serverOutputLogger.error("So this push event will be ignored.");
 			return;
 		}
+		serverOutputLogger.error(
+			`Unsupported content-type ${header["content-type"]}. Please use application/json or application/x-www-form-urlencoded`,
+		);
 		res.status(400).json({
 			error: `Unsupported content-type ${header["content-type"]}. Please use application/json or application/x-www-form-urlencoded`,
 		});
@@ -68,19 +71,34 @@ export const assignWebhookRouters = (server: Express, callback: (payload: IGithu
 	};
 
 	// Middleware for validating branch, is current branch consist with remote branch.
-	const validateBranch: Handler = (req, res, next) => {
+	// And only changes for master-branch will be passed.
+	const validateGitStatus: Handler = (req, res, next) => {
 		const payload = req.body as IGithubWebhookPayload;
-		if (GitStatus === null) {
+
+		const masterBranch = payload.repository.master_branch;
+
+		if (GitStatus == null || GitStatus.currentBranch == null) {
 			serverOutputLogger.error("Can not detect current git status.");
+			serverOutputLogger.error("Maybe you should init or reset the git.");
 			res.status(500).json({ error: "Internal Server Error" });
 			return;
 		}
-		if (GitStatus.currentBranch !== payload.repository.default_branch) {
+
+		// Check whether current git branch is master branch.
+		if (GitStatus.currentBranch !== masterBranch) {
 			serverOutputLogger.error(`Current branch ${GitStatus.currentBranch} is not the default branch.`);
-			serverOutputLogger.error(`Your should checkout the branch ${payload.repository.default_branch} manually.`);
+			serverOutputLogger.error(`Your should checkout the branch ${masterBranch} manually.`);
 			serverOutputLogger.error("So this push event will be ignored.");
 
-			res.status(500).json({ error: "Internal Server Error" });
+			res.status(500).json({ error: `Current branch ${GitStatus.currentBranch} is not the default branch.` });
+			return;
+		}
+		// Check whether the changes received is for master branch.
+		if (payload.ref !== `refs/heads/${masterBranch}` && payload.ref !== masterBranch) {
+			serverOutputLogger.error(`Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}`);
+			serverOutputLogger.error("So this push event will be ignored.");
+
+			res.status(500).json({ error: `Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}` });
 			return;
 		}
 		next();
@@ -116,7 +134,7 @@ export const assignWebhookRouters = (server: Express, callback: (payload: IGithu
 	};
 
 	// Assign routers to server.
-	server.post("/", logWebhook, processContentType, validateEvent, validateBranch, validateSignature, applyPayload);
+	server.post("/", logWebhook, processContentType, validateEvent, validateGitStatus, validateSignature, applyPayload);
 
 	// Router to check if the server is running.
 	server.get("/", (_req, res) => {

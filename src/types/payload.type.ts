@@ -80,6 +80,7 @@ export interface IGithubWebhookPayload {
 		is_template: boolean;
 		visibility: string;
 		default_branch: string;
+		master_branch: string;
 	};
 	pusher: {
 		name: string;
