@@ -1,17 +1,20 @@
 import { bold, cyan, underline } from "colors";
 import express from "express";
-import { ExecuteActions } from "./action";
-import { ACTIONS, LOCALHOST_ADDRESS, PORT } from "./consts";
+import { ExecuteShellActions } from "./action";
 import { GitStatus } from "./git";
 import { isPortInUse } from "./libs/port";
-import { appOutputLogger, serverOutputLogger } from "./log";
+import { appOutputLogger, LOG_FILENAME } from "./log";
 import { assignWebhookRouters } from "./server";
+import { ACTIONS, PORT } from "./config";
+
+export const LOCALHOST_ADDRESS = `http:\/\/localhost:${PORT}\/`;
 
 const main = async () => {
+	console.log(LOG_FILENAME);
 	const server = express();
 
 	// Check if git status is null.
-	if (GitStatus == null) {
+	if (GitStatus == null || GitStatus.currentBranch == null) {
 		appOutputLogger.error("Can not detect current git status.");
 		appOutputLogger.error("Maybe you should init or reset the local git repository.");
 		process.exit(1);
@@ -27,7 +30,7 @@ const main = async () => {
 
 	// Assign webhook routers to the server.
 	assignWebhookRouters(server, (payload) => {
-		ExecuteActions(payload, ACTIONS);
+		ExecuteShellActions(payload, ACTIONS);
 	});
 
 	// Start the server.

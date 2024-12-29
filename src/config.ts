@@ -2,14 +2,14 @@ import fs from "node:fs";
 import { z } from "zod";
 import { appOutputLogger } from "./log";
 
-export const configSchema = z.object({
+const configSchema = z.object({
 	PORT: z.number().default(3000),
 	SECRET: z.string().nullable(),
 	ACTIONS: z.array(z.string()).default([]),
 	LOG_PATH: z.string().default("./logs"),
 });
 
-export const loadConfigFromFile = (filePath: string) => {
+const loadConfigFromFile = (filePath: string) => {
 	try {
 		const fileContent = fs.readFileSync(filePath, "utf-8");
 		const parsedContent = JSON.parse(fileContent);
@@ -26,3 +26,11 @@ export const loadConfigFromFile = (filePath: string) => {
 		process.exit(1);
 	}
 };
+
+export const CONFIG_FILENAME = "git-auto-deploy.json";
+export const CONFIG = loadConfigFromFile(CONFIG_FILENAME);
+
+export const PORT = CONFIG.PORT;
+export const LOG_PATH = CONFIG.LOG_PATH;
+export const SECRET = CONFIG.SECRET;
+export const ACTIONS = CONFIG.ACTIONS;

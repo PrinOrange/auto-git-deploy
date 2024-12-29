@@ -2,7 +2,7 @@ import shell from "shelljs";
 import type { IGithubWebhookPayload } from "./types/payload.type";
 import { GitStatus } from "./git";
 
-export const ExecuteActions = (payload: IGithubWebhookPayload, commands: string[]) => {
+export const ExecuteShellActions = (payload: IGithubWebhookPayload, commands: string[]) => {
 	if (GitStatus === null) {
 		// TODO: actions for case that git status is null.
 		return;

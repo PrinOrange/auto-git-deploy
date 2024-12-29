@@ -1,7 +1,13 @@
 import log4js from "log4js";
-import { LOG_BACKUPS, LOG_FILENAME, MAX_LOG_SIZE } from "./consts";
+import { join } from "node:path";
+import { LOG_PATH } from "./config";
 
-log4js.configure({
+export const LOG_FILENAME = join(LOG_PATH, "git-auto-deploy.log");
+
+export const MAX_LOG_SIZE = 10485760;
+export const LOG_BACKUPS = 3;
+
+const logger = log4js.configure({
 	appenders: {
 		fileAppender: {
 			type: "file",
@@ -23,18 +29,18 @@ log4js.configure({
 			appenders: ["fileAppender", "consoleAppender"],
 			level: "info",
 		},
-		serverOutput: {
+		webhookOutput: {
 			appenders: ["fileAppender"],
 			level: "info",
 		},
-		commandOutput: {
+		shellCommandOutput: {
 			appenders: ["fileAppender"],
 			level: "info",
 		},
 	},
 });
 
-export const appOutputLogger = log4js.getLogger("appOutput");
-export const serverOutputLogger = log4js.getLogger("serverOutput");
-export const commandOutputLogger = log4js.getLogger("commandOutput");
-export const defaultLogger = log4js.getLogger();
+export const appOutputLogger = logger.getLogger("appOutput");
+export const webhookOutputLogger = logger.getLogger("webhookOutput");
+export const shellCommandOutputLogger = logger.getLogger("shellCommandOutput");
+export const defaultLogger = logger.getLogger();

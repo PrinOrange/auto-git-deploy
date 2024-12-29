@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import type { IGithubWebhookPayload } from "./types/payload.type";
-import { serverOutputLogger } from "./log";
-import { SECRET } from "./consts";
+import { webhookOutputLogger } from "./log";
+import { SECRET } from "./config";
 
 /**
  * Verify GitHub webhook signature
@@ -30,9 +30,9 @@ export function verifyGithubWebhook(payload: IGithubWebhookPayload, signature: s
 		// Compare the calculated digest with the signature in a timing-safe way
 		return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signatureHash));
 	} catch (error) {
-		serverOutputLogger.error("Error verifying GitHub webhook signature:", error);
-		serverOutputLogger.error("Signature:", signature);
-		serverOutputLogger.error("Payload:", payload);
+		webhookOutputLogger.error("Error verifying GitHub webhook signature:", error);
+		webhookOutputLogger.error("Signature:", signature);
+		webhookOutputLogger.error("Payload:", payload);
 		return false;
 	}
 }
