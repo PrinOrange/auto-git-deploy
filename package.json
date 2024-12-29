@@ -2,13 +2,13 @@
 	"name": "auto-git-deploy",
 	"version": "1.0.0",
 	"description": "",
-	"type": "module",
 	"bin": {
 		"auto-deploy": "./dist/index.js"
 	},
 	"scripts": {
 		"build": "ncc build ./src/index.ts --minify -o dist",
 		"format": "biome format --write .",
+		"clean": "tsx ./scripts/clean.ts",
 		"test": ""
 	},
 	"keywords": ["github", "webhook", "auto-deploy", "deploy", "git", "O&M", "github-api"],
@@ -32,6 +32,7 @@
 		"@types/node": "^22.10.2",
 		"@types/shelljs": "^0.8.15",
 		"@vercel/ncc": "^0.38.3",
+		"tsx": "^4.19.2",
 		"typescript": "^5.7.2"
 	}
 }
