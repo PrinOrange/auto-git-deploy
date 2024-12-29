@@ -32,7 +32,7 @@ export function verifyGithubWebhook(payload: IGithubWebhookPayload, signature: s
 	} catch (error) {
 		serverOutputLogger.error("Error verifying GitHub webhook signature:", error);
 		serverOutputLogger.error("Signature:", signature);
-		serverOutputLogger.error("Payload:", SECRET);
+		serverOutputLogger.error("Payload:", payload);
 		return false;
 	}
 }

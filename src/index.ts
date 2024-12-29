@@ -32,10 +32,13 @@ const main = async () => {
 	// Start the server.
 	server.listen(PORT, () => {
 		serverOutputLogger.info(`Server started at ${LOCALHOST_ADDRESS}`);
+		console.log("\n");
 		console.log(`🚀 Server started at ${cyan(bold(LOCALHOST_ADDRESS))} `);
 		console.log(`Listening the remote repo: ${underline(GitStatus!.remoteUrl!)}`);
 		console.log(`Current branch: ${GitStatus!.currentBranch}`);
+		console.log(`Server PID: ${process.pid}, Runtime version: ${process.version}`);
 		console.log("Next, use reverse proxy (such as nginx) to map your domain name to this address.");
+		console.log("\n");
 	});
 };
 
