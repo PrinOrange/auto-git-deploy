@@ -64,7 +64,7 @@ export const assignWebhookRouters = (server: Express, callback: (payload: IGithu
 			serverOutputLogger.error(`Event ${header["x-github-event"]} is not supported. Only push event is supported.`);
 			serverOutputLogger.error("So this push event will be ignored.");
 
-			res.status(503).json({ error: "Internal Github Event" });
+			res.status(503).json({ error: "Invalid Github Event" });
 			return;
 		}
 		next();
@@ -94,7 +94,7 @@ export const assignWebhookRouters = (server: Express, callback: (payload: IGithu
 			return;
 		}
 		// Check whether the changes received is for master branch.
-		if (payload.ref !== `refs/heads/${masterBranch}` && payload.ref !== masterBranch) {
+		if (payload.ref !== `refs/heads/${masterBranch}` || payload.ref !== masterBranch) {
 			serverOutputLogger.error(`Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}`);
 			serverOutputLogger.error("So this push event will be ignored.");
 
