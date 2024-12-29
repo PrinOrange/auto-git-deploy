@@ -2,16 +2,17 @@
 	"name": "auto-git-deploy",
 	"version": "1.0.0",
 	"description": "",
+	"type": "module",
 	"bin": {
-		"auto-git-deploy": "./dist/index.js"
+		"auto-deploy": "./dist/index.js"
 	},
 	"scripts": {
-		"build": "ncc build ./src/index.ts -o dist",
+		"build": "ncc build ./src/index.ts --minify -o dist",
 		"format": "biome format --write .",
 		"test": ""
 	},
-	"keywords": [],
-	"author": "",
+	"keywords": ["github", "webhook", "auto-deploy", "deploy", "git", "O&M", "github-api"],
+	"author": "但为君故",
 	"license": "MIT",
 	"dependencies": {
 		"body-parser": "^1.20.3",

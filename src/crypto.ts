@@ -8,11 +8,7 @@ import { GithubWebhookPayload } from "./types/payload.type";
  * @param signature - The value of the `X-Hub-Signature-256` header.
  * @returns `true` if the signature is valid, otherwise `false`.
  */
-export function verifyGithubWebhook(
-	secret: string,
-	payload: GithubWebhookPayload,
-	signature: string,
-): boolean {
+export function verifyGithubWebhook(secret: string, payload: GithubWebhookPayload, signature: string): boolean {
 	if (!signature || !signature.startsWith("sha256=")) {
 		return false;
 	}
@@ -26,8 +22,5 @@ export function verifyGithubWebhook(
 	const digest = hmac.digest("hex");
 
 	// Compare the calculated digest with the signature in a timing-safe way
-	return crypto.timingSafeEqual(
-		Buffer.from(digest),
-		Buffer.from(signatureHash),
-	);
+	return crypto.timingSafeEqual(Buffer.from(digest), Buffer.from(signatureHash));
 }

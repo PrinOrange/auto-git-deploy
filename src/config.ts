@@ -2,10 +2,10 @@ import fs from "fs";
 import { z } from "zod";
 
 export const configSchema = z.object({
-	port: z.number().default(3000),
-	payloadURL: z.string().default("/webhook"),
-	secret: z.string().nullable(),
-	actions: z.array(z.string()).default([]),
+	PORT: z.number().default(3000),
+	SECRET: z.string().nullable(),
+	ACTIONS: z.array(z.string()).default([]),
+	LOG_PATH: z.string().default("./logs"),
 });
 
 export const loadConfigFromFile = (filePath: string) => {

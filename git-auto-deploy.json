@@ -1,6 +1,7 @@
 {
-	"secret": "your_webhook_secret",
-	"payloadUrl": "/webhook",
-	"port": 3300,
-	"actions": ["pnpm install", "pnpm run build", "pnpm run start"]
+	"SECRET": "your_webhook_secret",
+	"PAYLOAD_URL": "/webhook",
+	"PORT": 3300,
+	"LOG_PATH": "logs",
+	"ACTIONS": ["pnpm install", "pnpm run build", "pnpm run start"]
 }

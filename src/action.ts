@@ -1,19 +1,18 @@
 import shell from "shelljs";
 import { GithubWebhookPayload } from "./types/payload.type";
-import { getCurrentGitState } from "./git";
+import { GitStatus } from "./git";
 
-export const ExecuteActions = (
-	payload: GithubWebhookPayload,
-	commands: string[],
-) => {
-	const gitStatus = getCurrentGitState();
-	if (gitStatus === null) {
+export const ExecuteActions = (payload: GithubWebhookPayload, commands: string[]) => {
+	if (GitStatus === null) {
+		// TODO: actions for case that git status is null.
 		return;
 	}
-	if (gitStatus.currentBranch !== payload.repository.default_branch) {
+	if (GitStatus.currentBranch !== payload.repository.default_branch) {
+		// TODO: actions for case that current branch is not the default branch.
 		return;
 	}
 
+	// Execute commands
 	commands.forEach((command) => {
 		const result = shell.exec(command, { silent: true });
 		if (result.code !== 0) {
