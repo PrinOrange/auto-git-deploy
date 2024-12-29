@@ -17,7 +17,7 @@ const main = async () => {
 	});
 
 	server.listen(port, () => {
-		console.log(`Server started at ${localhostAddress}`);
+		console.log(`Server started at ${localhostAddress} `);
 	});
 };
 
