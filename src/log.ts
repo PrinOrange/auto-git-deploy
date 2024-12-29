@@ -19,6 +19,10 @@ log4js.configure({
 			appenders: ["consoleAppender"],
 			level: "info",
 		},
+		appOutput: {
+			appenders: ["fileAppender", "consoleAppender"],
+			level: "info",
+		},
 		serverOutput: {
 			appenders: ["fileAppender"],
 			level: "info",
@@ -30,6 +34,7 @@ log4js.configure({
 	},
 });
 
+export const appOutputLogger = log4js.getLogger("appOutput");
 export const serverOutputLogger = log4js.getLogger("serverOutput");
 export const commandOutputLogger = log4js.getLogger("commandOutput");
 export const defaultLogger = log4js.getLogger();

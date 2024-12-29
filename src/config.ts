@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import { z } from "zod";
+import { appOutputLogger } from "./log";
 
 export const configSchema = z.object({
 	PORT: z.number().default(3000),
@@ -15,12 +16,12 @@ export const loadConfigFromFile = (filePath: string) => {
 		return configSchema.parse(parsedContent);
 	} catch (error) {
 		if (error instanceof z.ZodError) {
-			console.error("Configuration validation failed:");
+			appOutputLogger.error("Configuration validation failed.");
 			for (const err of error.errors) {
-				console.error(`- ${err.path.join(".")}: ${err.message}`);
+				appOutputLogger.error(`- ${err.path.join(".")}: ${err.message}`);
 			}
 		} else {
-			console.error("Error reading or parsing configuration file:", error);
+			appOutputLogger.error("Error reading or parsing configuration file:", error);
 		}
 		process.exit(1);
 	}
