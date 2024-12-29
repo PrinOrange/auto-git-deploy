@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
-import { GitState } from "./types/git.type";
+import type { IGitState } from "./types/git.type";
 
-function getCurrentGitStatus(): GitState | null {
+function getCurrentGitStatus(): IGitState | null {
 	try {
 		const remoteUrl = execSync("git config --get remote.origin.url", {
 			encoding: "utf-8",

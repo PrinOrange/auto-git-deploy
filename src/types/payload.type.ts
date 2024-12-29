@@ -1,4 +1,4 @@
-export interface GithubWebhookRequestHeader {
+export interface IGithubWebhookRequestHeader {
 	host: string;
 	"x-real-ip": string;
 	"x-forwarded-for": string;
@@ -17,7 +17,7 @@ export interface GithubWebhookRequestHeader {
 	"x-hub-signature-256"?: string; // For sha256 verification
 }
 
-export interface GithubWebhookPayload {
+export interface IGithubWebhookPayload {
 	ref: string;
 	before: string;
 	after: string;

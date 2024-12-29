@@ -8,10 +8,21 @@
 	"scripts": {
 		"build": "ncc build ./src/index.ts --minify -o dist",
 		"format": "biome format --write .",
+		"lint": "biome lint",
+		"lint:fix": "biome lint --fix .",
 		"clean": "tsx ./scripts/clean.ts",
+		"dev": "bun run ./src/index.ts --watch",
 		"test": ""
 	},
-	"keywords": ["github", "webhook", "auto-deploy", "deploy", "git", "O&M", "github-api"],
+	"keywords": [
+		"github",
+		"webhook",
+		"auto-deploy",
+		"deploy",
+		"git",
+		"O&M",
+		"github-api"
+	],
 	"author": "但为君故",
 	"license": "MIT",
 	"dependencies": {

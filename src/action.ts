@@ -1,8 +1,8 @@
 import shell from "shelljs";
-import { GithubWebhookPayload } from "./types/payload.type";
+import type { IGithubWebhookPayload } from "./types/payload.type";
 import { GitStatus } from "./git";
 
-export const ExecuteActions = (payload: GithubWebhookPayload, commands: string[]) => {
+export const ExecuteActions = (payload: IGithubWebhookPayload, commands: string[]) => {
 	if (GitStatus === null) {
 		// TODO: actions for case that git status is null.
 		return;
@@ -13,7 +13,7 @@ export const ExecuteActions = (payload: GithubWebhookPayload, commands: string[]
 	}
 
 	// Execute commands
-	commands.forEach((command) => {
+	for (const command of commands) {
 		const result = shell.exec(command, { silent: true });
 		if (result.code !== 0) {
 			shell.echo(`命令 ${command} 执行失败`);
@@ -21,5 +21,5 @@ export const ExecuteActions = (payload: GithubWebhookPayload, commands: string[]
 		} else {
 			shell.echo(`命令 ${command} 执行成功`);
 		}
-	});
+	}
 };

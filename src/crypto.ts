@@ -1,5 +1,5 @@
-import crypto from "crypto";
-import { GithubWebhookPayload } from "./types/payload.type";
+import crypto from "node:crypto";
+import type { IGithubWebhookPayload } from "./types/payload.type";
 import { serverOutputLogger } from "./log";
 import { SECRET } from "./consts";
 
@@ -10,7 +10,7 @@ import { SECRET } from "./consts";
  * @param signature - The value of the `X-Hub-Signature-256` header.
  * @returns `true` if the signature is valid, otherwise `false`.
  */
-export function verifyGithubWebhook(payload: GithubWebhookPayload, signature: string): boolean {
+export function verifyGithubWebhook(payload: IGithubWebhookPayload, signature: string): boolean {
 	if (SECRET == null) {
 		return true;
 	}

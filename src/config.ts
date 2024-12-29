@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs";
 import { z } from "zod";
 
 export const configSchema = z.object({
@@ -16,9 +16,9 @@ export const loadConfigFromFile = (filePath: string) => {
 	} catch (error) {
 		if (error instanceof z.ZodError) {
 			console.error("Configuration validation failed:");
-			error.errors.forEach((err) => {
+			for (const err of error.errors) {
 				console.error(`- ${err.path.join(".")}: ${err.message}`);
-			});
+			}
 		} else {
 			console.error("Error reading or parsing configuration file:", error);
 		}
