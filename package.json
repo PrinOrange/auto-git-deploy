@@ -14,15 +14,8 @@
 		"dev": "bun run ./src/index.ts --watch",
 		"test": ""
 	},
-	"keywords": [
-		"github",
-		"webhook",
-		"auto-deploy",
-		"deploy",
-		"git",
-		"O&M",
-		"github-api"
-	],
+	"files": ["dist/", "README.md", "LICENSE"],
+	"keywords": ["github", "webhook", "auto-deploy", "deploy", "git", "O&M", "github-api"],
 	"author": "但为君故",
 	"license": "MIT",
 	"dependencies": {
