@@ -1,6 +1,0 @@
-{
-	"PORT": 3300,
-	"ACTIONS": [],
-	"SECRET": null,
-	"LOG_PATH": "./logs"
-}
