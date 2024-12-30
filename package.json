@@ -1,6 +1,6 @@
 {
 	"name": "auto-git-deploy",
-	"version": "1.0.0",
+	"version": "1.0.1-alpha.0",
 	"description": "",
 	"bin": {
 		"auto-deploy": "./dist/index.js"
@@ -14,8 +14,20 @@
 		"dev": "bun run ./src/app.ts --watch",
 		"test": ""
 	},
-	"files": ["dist/", "README.md", "LICENSE"],
-	"keywords": ["github", "webhook", "auto-deploy", "deploy", "git", "O&M", "github-api"],
+	"files": [
+		"dist/",
+		"README.md",
+		"LICENSE"
+	],
+	"keywords": [
+		"github",
+		"webhook",
+		"auto-deploy",
+		"deploy",
+		"git",
+		"O&M",
+		"github-api"
+	],
 	"author": "但为君故",
 	"license": "MIT",
 	"dependencies": {
