@@ -3,8 +3,9 @@ import path from "node:path";
 import { z } from "zod";
 import type { IConfig } from "@/types/config.type";
 import { fileExists } from "@/libs/file";
+import { bold } from "colors";
 
-export const CONFIG_FILEPATH = path.join("git-auto-deploy.json");
+export const CONFIG_FILEPATH = path.join("autodeploy.config.json");
 
 const configSchema = z.object({
 	PORT: z.number().default(3000),
@@ -51,6 +52,7 @@ export const initConfig = () => {
 	fs.writeFileSync(CONFIG_FILEPATH, JSON.stringify(config, null, 2));
 	console.log(`Configuration file is saved at ${path.resolve(CONFIG_FILEPATH)}.`);
 	console.log("Now please edit it to set configuration.");
+	console.log(`After that ${bold("DON NOT FORGET add it to .gitignore file")})`);
 };
 
 export const CONFIG = _loadConfig();
