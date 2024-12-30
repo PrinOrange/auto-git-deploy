@@ -3,7 +3,7 @@ import type { IGitStatus } from "@/types/git.type";
 import shell from "shelljs";
 import type { IGithubWebhookPayload } from "@/types/payload.type";
 
-function getCurrentGitStatus(): IGitStatus | null {
+export function getCurrentGitStatus(): IGitStatus | null {
 	try {
 		// Check if inside a Git work tree
 		const isInsideWorkTreeResult = shell.exec("git rev-parse --is-inside-work-tree", { silent: true });
@@ -22,12 +22,16 @@ function getCurrentGitStatus(): IGitStatus | null {
 		}
 
 		// Check if the staging area is empty
-		const stagingAreaResult = shell.exec("git diff --cached --name-only", {
-			silent: true,
-		});
-
+		const stagingAreaResult = shell.exec("git diff --cached --name-only", { silent: true });
 		if (stagingAreaResult.code !== 0) {
 			console.error(`Failed to check staging area: ${stagingAreaResult.stderr}`);
+			return null;
+		}
+
+		// Detect unstaged changes
+		const unstagedChangesResult = shell.exec("git diff --name-only", { silent: true });
+		if (unstagedChangesResult.code !== 0) {
+			console.error(`Failed to check unstaged changes: ${unstagedChangesResult.stderr}`);
 			return null;
 		}
 
@@ -35,11 +39,13 @@ function getCurrentGitStatus(): IGitStatus | null {
 		const remoteOriginURL = rawRemoteOriginURLResult.stdout.trim() || null;
 		const currentBranch = rawCurrentBranchResult.stdout.trim() || null;
 		const isStagingAreaEmpty = stagingAreaResult.stdout.trim() === "";
+		const unstagedFiles = unstagedChangesResult.stdout.trim() ? unstagedChangesResult.stdout.trim().split("\n") : [];
 
 		return {
 			remoteOriginURL,
 			currentBranch,
 			isStagingAreaEmpty,
+			unstagedFiles,
 		};
 	} catch (error) {
 		console.error("An unexpected error occurred:", error);
@@ -71,6 +77,13 @@ export function checkGitStatus(): boolean {
 	if (GitStatus == null || GitStatus.currentBranch == null) {
 		appOutputLogger.error("Can not detect current git status.");
 		appOutputLogger.error("Maybe you should init or reset the local git repository and add remote origin repository.");
+		return false;
+	}
+
+	// Ensure there is no unstaged file.
+	if (GitStatus.unstagedFiles.length !== 0) {
+		appOutputLogger.error("There are unstaged files in current git status.");
+		appOutputLogger.error("Please stage and commit them.");
 		return false;
 	}
 
