@@ -12,14 +12,18 @@ export const ExecuteShellActions = (payload: IGithubWebhookPayload, commands: st
 		return;
 	}
 
-	// Execute commands
-	for (const command of commands) {
-		const result = shell.exec(command, { silent: true });
-		if (result.code !== 0) {
-			shell.echo(`命令 ${command} 执行失败`);
-			// shell.exit(1); // 如果你想在失败时退出程序
-		} else {
-			shell.echo(`命令 ${command} 执行成功`);
-		}
-	}
+	commands.map((cmd) => {
+		console.log(`fake: executing command ${cmd}`);
+	});
+
+	// // Execute commands
+	// for (const command of commands) {
+	// 	const result = shell.exec(command, { silent: true });
+	// 	if (result.code !== 0) {
+	// 		shell.echo(`命令 ${command} 执行失败`);
+	// 		// shell.exit(1); // 如果你想在失败时退出程序
+	// 	} else {
+	// 		shell.echo(`命令 ${command} 执行成功`);
+	// 	}
+	// }
 };
