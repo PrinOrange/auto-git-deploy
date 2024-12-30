@@ -1,22 +1,21 @@
 import { bold, cyan, underline } from "colors";
 import express from "express";
 import { ExecuteShellActions } from "./action";
+import { appOutputLogger } from "./log";
+import { ACTIONS, PORT } from "./config";
 import { GitStatus } from "./git";
 import { isPortInUse } from "./libs/port";
-import { appOutputLogger, LOG_FILENAME } from "./log";
 import { assignWebhookRouters } from "./server";
-import { ACTIONS, PORT } from "./config";
 
-export const LOCALHOST_ADDRESS = `http:\/\/localhost:${PORT}\/`;
+const LOCALHOST_ADDRESS = `http:\/\/localhost:${PORT}\/`;
 
 const main = async () => {
-	console.log(LOG_FILENAME);
 	const server = express();
 
 	// Check if git status is null.
 	if (GitStatus == null || GitStatus.currentBranch == null) {
 		appOutputLogger.error("Can not detect current git status.");
-		appOutputLogger.error("Maybe you should init or reset the local git repository.");
+		appOutputLogger.error("Maybe you should init or reset the local git repository and add remote origin repository.");
 		process.exit(1);
 	}
 
@@ -37,10 +36,11 @@ const main = async () => {
 	server.listen(PORT, () => {
 		appOutputLogger.info(`Server started at ${LOCALHOST_ADDRESS}`);
 		console.log("\n");
-		console.log(`🚀 Server started at ${cyan(bold(LOCALHOST_ADDRESS))} `);
-		console.log(`Listening the remote repo: ${underline(GitStatus!.remoteOriginURL!)}`);
-		console.log(`Current branch: ${GitStatus!.currentBranch}`);
-		console.log(`Server PID: ${process.pid}, Runtime version: ${process.version}`);
+		console.log("🚀 Server started Successfully...");
+		console.log(`${bold("Running on local address:")} ${cyan(LOCALHOST_ADDRESS)}`);
+		console.log(`${bold("Listening the remote repo:")} ${underline(GitStatus!.remoteOriginURL!)}`);
+		console.log(`${bold("Current branch:")} ${GitStatus!.currentBranch}`);
+		console.log(`${bold("Server PID:")} ${process.pid}, ${bold("Runtime version:")} ${process.version}`);
 		console.log("Next, use reverse proxy (such as nginx) to map your domain name to this address.");
 		console.log("\n");
 	});

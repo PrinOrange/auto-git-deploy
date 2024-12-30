@@ -1,10 +1,11 @@
+import os from "node:os";
 import type { Express, Handler } from "express";
 import express from "express";
+import { SECRET } from "./config";
 import { verifyGithubWebhook } from "./crypto";
 import { GitStatus } from "./git";
 import { webhookOutputLogger } from "./log";
 import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "./types/payload.type";
-import { SECRET } from "./config";
 
 /**
  * Assign webhook routers to the server.
@@ -90,15 +91,19 @@ export const assignWebhookRouters = (server: Express, callback: (payload: IGithu
 			webhookOutputLogger.error(`Your should checkout the branch ${masterBranch} manually.`);
 			webhookOutputLogger.error("So this push event will be ignored.");
 
-			res.status(500).json({ error: `Current branch ${GitStatus.currentBranch} is not the default branch.` });
+			res.status(500).json({
+				error: `Current branch ${GitStatus.currentBranch} is not the default branch.`,
+			});
 			return;
 		}
 		// Check whether the changes received is for master branch.
-		if (payload.ref !== `refs/heads/${masterBranch}` || payload.ref !== masterBranch) {
+		if (payload.ref !== `refs/heads/${masterBranch}` && payload.ref !== masterBranch) {
 			webhookOutputLogger.error(`Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}`);
 			webhookOutputLogger.error("So this push event will be ignored.");
 
-			res.status(500).json({ error: `Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}` });
+			res.status(500).json({
+				error: `Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}`,
+			});
 			return;
 		}
 		next();

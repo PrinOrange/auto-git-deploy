@@ -2,6 +2,7 @@
 	"name": "auto-git-deploy",
 	"version": "1.0.1-alpha.1",
 	"description": "",
+	"type": "module",
 	"bin": {
 		"auto-deploy": "./dist/index.js"
 	},
@@ -14,33 +15,10 @@
 		"dev": "bun run ./src/app.ts --watch",
 		"test": ""
 	},
-	"files": [
-		"dist/",
-		"README.md",
-		"LICENSE"
-	],
-	"keywords": [
-		"github",
-		"webhook",
-		"auto-deploy",
-		"deploy",
-		"git",
-		"O&M",
-		"github-api"
-	],
+	"files": ["dist/", "README.md", "LICENSE"],
+	"keywords": ["github", "webhook", "auto-deploy", "deploy", "git", "O&M", "github-api"],
 	"author": "但为君故",
 	"license": "MIT",
-	"dependencies": {
-		"body-parser": "2.0.2",
-		"colors": "^1.4.0",
-		"dotenv": "^16.4.7",
-		"express": "5.0.1",
-		"lodash": "^4.17.21",
-		"log4js": "^6.9.1",
-		"shelljs": "^0.8.5",
-		"url-join": "^5.0.0",
-		"zod": "^3.24.1"
-	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/body-parser": "^1.19.5",
@@ -48,7 +26,16 @@
 		"@types/node": "^22.10.2",
 		"@types/shelljs": "^0.8.15",
 		"@vercel/ncc": "^0.38.3",
+		"colors": "^1.4.0",
+		"dotenv": "^16.4.7",
+		"express": "5.0.1",
+		"internal-ip": "^8.0.0",
+		"lodash": "^4.17.21",
+		"log4js": "^6.9.1",
+		"shelljs": "^0.8.5",
 		"tsx": "^4.19.2",
-		"typescript": "^5.7.2"
+		"typescript": "^5.7.2",
+		"url-join": "^5.0.0",
+		"zod": "^3.24.1"
 	}
 }
