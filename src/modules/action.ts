@@ -7,16 +7,16 @@ export const ExecuteShellActions = (_payload: IGithubWebhookPayload) => {
 	for (const command of ACTIONS) {
 		appOutputLogger.info(`Executing command: ${command}`);
 
-		const result = shell.exec(command, { silent: true });
+		const process = shell.exec(command, { silent: true });
 
-		if (result.code !== 0) {
-			appOutputLogger.error(`Command failed: ${command} with exit code ${result.code}`);
-			appOutputLogger.error(`${result.stdout}`);
-			appOutputLogger.error(`${result.stderr}`);
+		if (process.code !== 0) {
+			appOutputLogger.error(`Command failed: ${command} with exit code ${process.code}`);
+			appOutputLogger.error(`${process.stdout}`);
+			appOutputLogger.error(`${process.stderr}`);
 			return;
 		}
 
 		appOutputLogger.info(`Command succeeded: ${command}`);
-		shellCommandOutputLogger.log(`Output: ${result.stdout}`);
+		shellCommandOutputLogger.log(`Output: ${process.stdout}`);
 	}
 };

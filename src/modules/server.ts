@@ -7,11 +7,22 @@ import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "@/types
 import { isPortInUse } from "@/libs/port";
 import { bold } from "colors";
 
-export const checkPortAvailability = async () => {
-	const availability = await isPortInUse(PORT);
-	if (availability) {
-		return true;
+/**
+ * Check if the port specified in the configuration file is available.
+ * @returns True if the port is available, false otherwise.
+ */
+export const checkPortAvailability = async (): Promise<boolean> => {
+	try {
+		// Check if the port is in use
+		const isAvailable = !(await isPortInUse(PORT));
+		if (isAvailable) {
+			return true;
+		}
+	} catch (error) {
+		// Log error if any exception occurs during port checking
+		appOutputLogger.error(`An error occurred while checking port availability: ${String(error)}`);
 	}
+	// Log the error for an unavailable port
 	appOutputLogger.error(`Port ${bold(`${PORT}`)} is already in use. Please try another port.`);
 	return false;
 };

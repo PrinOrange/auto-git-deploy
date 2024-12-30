@@ -4,6 +4,8 @@ temp
 
 logs
 
+.cache
+
 .DS_Store
 .env
 
