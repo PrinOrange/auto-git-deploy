@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
-import { SECRET } from "./config";
-import type { IGithubWebhookPayload } from "./types/payload.type";
+import { SECRET } from "@/config/config";
+import type { IGithubWebhookPayload } from "@/types/payload.type";
 
 /**
  * Verify GitHub webhook signature

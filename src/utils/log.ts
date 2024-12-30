@@ -1,6 +1,6 @@
+import { LOG_PATH } from "@/config/config";
 import log4js from "log4js";
 import { join } from "node:path";
-import { LOG_PATH } from "./config";
 
 export const LOG_FILENAME = join(LOG_PATH, "git-auto-deploy.log");
 

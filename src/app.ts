@@ -1,12 +1,10 @@
+import { checkConfigExist, initConfig, PORT } from "@/config/config";
+import { ExecuteShellActions } from "@/modules/action";
+import { checkGitBranch, checkGitStatus, GitStatus, pullFromOrigin } from "@/modules/git";
+import { assignWebhookRouters, checkPortAvailability } from "@/modules/server";
+import { appOutputLogger } from "@/utils/log";
 import { bold, cyan, underline } from "colors";
 import express from "express";
-import { ExecuteShellActions } from "./action";
-import { appOutputLogger } from "./log";
-import { ACTIONS, CONFIG_FILEPATH, initConfig, PORT } from "./config";
-import { GitStatus, pullFromOrigin } from "./git";
-import { isPortInUse } from "./libs/port";
-import { assignWebhookRouters } from "./server";
-import { fileExists } from "./libs/file";
 
 const LOCALHOST_ADDRESS = `http:\/\/localhost:${PORT}\/`;
 
@@ -15,7 +13,7 @@ const main = async () => {
 
 	// Is command for init configuration file.
 	if (args[0] === "init") {
-		if (!fileExists(CONFIG_FILEPATH)) {
+		if (!checkConfigExist()) {
 			initConfig();
 		}
 		console.error("Configuration file is already existed.");
@@ -23,33 +21,28 @@ const main = async () => {
 	}
 
 	// Check does the configuration file exist.
-	if (!fileExists(CONFIG_FILEPATH)) {
-		console.error("Configuration file does not exist.");
-		console.error("Maybe you should run command 'autodeploy init' first.");
+	if (!checkConfigExist()) {
+		process.exit(1);
+	}
+
+	// Check is git status ready.
+	if (!checkGitStatus()) {
+		process.exit(1);
+	}
+
+	// Check if the port is in use.
+	if (!(await checkPortAvailability())) {
 		process.exit(1);
 	}
 
 	const server = express();
 
-	// Check if git status is null.
-	if (GitStatus == null || GitStatus.currentBranch == null) {
-		appOutputLogger.error("Can not detect current git status.");
-		appOutputLogger.error("Maybe you should init or reset the local git repository and add remote origin repository.");
-		process.exit(1);
-	}
-
-	// Check if the port is in use.
-	await isPortInUse(PORT).then((inUse) => {
-		if (inUse) {
-			appOutputLogger.error(`Port ${bold(`${PORT}`)} is already in use. Please try another port.`);
-			process.exit(1);
-		}
-	});
-
 	// Assign webhook routers to the server.
 	assignWebhookRouters(server, (payload) => {
-		pullFromOrigin();
-		ExecuteShellActions(payload);
+		// Execute shell actions only if git pull successes.
+		if (pullFromOrigin() && checkGitBranch(payload, GitStatus!)) {
+			ExecuteShellActions(payload);
+		}
 	});
 
 	// Start the server.

@@ -1,7 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
-import type { IConfig } from "./types/config.type";
+import type { IConfig } from "@/types/config.type";
+import { fileExists } from "@/libs/file";
 
 export const CONFIG_FILEPATH = path.join("git-auto-deploy.json");
 
@@ -12,9 +13,18 @@ const configSchema = z.object({
 	LOG_PATH: z.string().default("./logs"),
 });
 
-const loadConfig = (filePath: string) => {
+export const checkConfigExist = () => {
+	if (!fileExists(CONFIG_FILEPATH)) {
+		console.error("Configuration file does not exist.");
+		console.error("Maybe you should run command 'autodeploy init' first.");
+		return false;
+	}
+	return true;
+};
+
+const _loadConfig = () => {
 	try {
-		const fileContent = fs.readFileSync(filePath, "utf-8");
+		const fileContent = fs.readFileSync(CONFIG_FILEPATH, "utf-8");
 		const parsedContent = JSON.parse(fileContent);
 		return configSchema.parse(parsedContent);
 	} catch (error) {
@@ -43,7 +53,7 @@ export const initConfig = () => {
 	console.log("Now please edit it to set configuration.");
 };
 
-export const CONFIG = loadConfig(CONFIG_FILEPATH);
+export const CONFIG = _loadConfig();
 
 export const PORT = CONFIG.PORT;
 export const LOG_PATH = CONFIG.LOG_PATH;
