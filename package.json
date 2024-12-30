@@ -1,6 +1,6 @@
 {
 	"name": "auto-git-deploy",
-	"version": "1.0.1-alpha.3",
+	"version": "1.0.1-alpha.4",
 	"description": "",
 	"bin": {
 		"autodeploy": "./dist/index.js"
