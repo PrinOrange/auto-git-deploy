@@ -1,5 +1,5 @@
-import { initConfig } from "@/config/config";
-import { webhookServer } from "./entry/webhook-server";
+import { webhookServer } from "@/entry/webhook-server";
+import { initConfig } from "@/utils/config";
 
 const main = async () => {
 	const args = process.argv?.slice(2);

@@ -1,4 +1,4 @@
-import { checkConfigExist, initConfig } from "@/config/config";
+import { checkConfigExist, initConfig } from "@/utils/config";
 
 export const ConfigInit = () => {
 	if (!checkConfigExist()) {

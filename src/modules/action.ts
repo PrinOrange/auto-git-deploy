@@ -1,10 +1,9 @@
-import { ACTIONS } from "@/config/config";
 import { appOutputLogger, shellCommandOutputLogger } from "@/utils/log";
 import type { IGithubWebhookPayload } from "@/types/payload.type";
 import shell from "shelljs";
 
-export const ExecuteShellActions = (_payload: IGithubWebhookPayload) => {
-	for (const command of ACTIONS) {
+export const ExecuteShellActions = (_payload: IGithubWebhookPayload, actions: string[]) => {
+	for (const command of actions) {
 		appOutputLogger.info(`Executing command: ${command}`);
 
 		const process = shell.exec(command, { silent: true });

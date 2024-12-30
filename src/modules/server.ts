@@ -1,6 +1,5 @@
 import type { Express, Handler } from "express";
 import express from "express";
-import { PORT, SECRET } from "@/config/config";
 import { verifyGithubWebhook } from "@/utils/crypto";
 import { appOutputLogger, webhookOutputLogger } from "@/utils/log";
 import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "@/types/payload.type";
@@ -11,10 +10,10 @@ import { bold } from "colors";
  * Check if the port specified in the configuration file is available.
  * @returns True if the port is available, false otherwise.
  */
-export const checkPortAvailability = async (): Promise<boolean> => {
+export const checkPortAvailability = async (port: number): Promise<boolean> => {
 	try {
 		// Check if the port is in use
-		const isAvailable = !(await isPortInUse(PORT));
+		const isAvailable = !(await isPortInUse(port));
 		if (isAvailable) {
 			return true;
 		}
@@ -23,7 +22,7 @@ export const checkPortAvailability = async (): Promise<boolean> => {
 		appOutputLogger.error(`An error occurred while checking port availability: ${String(error)}`);
 	}
 	// Log the error for an unavailable port
-	appOutputLogger.error(`Port ${bold(`${PORT}`)} is already in use. Please try another port.`);
+	appOutputLogger.error(`Port ${bold(`${port}`)} is already in use. Please try another port.`);
 	return false;
 };
 
@@ -34,6 +33,7 @@ export const checkPortAvailability = async (): Promise<boolean> => {
  */
 export const assignWebhookRouters = (
 	server: Express,
+	secret: string | null,
 	callback: (header: IGithubWebhookRequestHeader, payload: IGithubWebhookPayload) => void,
 ) => {
 	server.use(express.json());
@@ -101,11 +101,11 @@ export const assignWebhookRouters = (
 		const header = req.headers as unknown as IGithubWebhookRequestHeader;
 		const signature = header["x-hub-signature-256"]?.toString() || "";
 		const payload = req.body;
-		if (SECRET == null) {
+		if (secret == null) {
 			next(); // Skip signature verification if secret is not set.
 			return;
 		}
-		if (!verifyGithubWebhook(payload, signature)) {
+		if (!verifyGithubWebhook(payload, secret, signature)) {
 			webhookOutputLogger.error("Received invalid signature from GitHub webhook.");
 			webhookOutputLogger.error("Signature:", signature);
 			webhookOutputLogger.error("Suspect this request is not from GitHub official webhook.");

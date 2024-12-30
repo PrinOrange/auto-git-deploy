@@ -1,10 +1,43 @@
-import { checkConfigExist, PORT } from "@/config/config";
 import { ExecuteShellActions } from "@/modules/action";
 import { GitStatus, checkGitBranch, checkGitStatus, pullFromOrigin } from "@/modules/git";
 import { assignWebhookRouters, checkPortAvailability } from "@/modules/server";
+import { checkConfigExist } from "@/utils/config";
 import { appOutputLogger } from "@/utils/log";
 import { bold, cyan, underline } from "colors";
 import express from "express";
+import { CONFIG_FILENAME } from "@/consts/consts";
+import fs from "node:fs";
+import { z } from "zod";
+
+const configSchema = z.object({
+	PORT: z.number().default(3000),
+	SECRET: z.string().nullable(),
+	ACTIONS: z.array(z.string()).default([]),
+});
+
+const loadConfig = () => {
+	try {
+		const fileContent = fs.readFileSync(CONFIG_FILENAME, "utf-8");
+		const parsedContent = JSON.parse(fileContent);
+		return configSchema.parse(parsedContent);
+	} catch (error) {
+		if (error instanceof z.ZodError) {
+			console.error("Configuration validation failed.");
+			for (const err of error.errors) {
+				console.error(`- ${err.path.join(".")}: ${err.message}`);
+			}
+		} else {
+			console.error("Error reading or parsing configuration file:", error);
+		}
+		process.exit(1);
+	}
+};
+
+export const CONFIG = loadConfig();
+
+export const PORT = CONFIG.PORT;
+export const SECRET = CONFIG.SECRET;
+export const ACTIONS = CONFIG.ACTIONS;
 
 const LOCALHOST_ADDRESS = `http:\/\/localhost:${PORT}\/`;
 
@@ -14,7 +47,7 @@ const checkEnvironment = async () => {
 	// Check is git status ready.
 	!checkGitStatus() && process.exit(1);
 	// Check if the port is in use.
-	!(await checkPortAvailability()) && process.exit(1);
+	!(await checkPortAvailability(PORT)) && process.exit(1);
 };
 
 export const webhookServer = async () => {
@@ -23,10 +56,10 @@ export const webhookServer = async () => {
 	const server = express();
 
 	// Assign webhook routers to the server.
-	assignWebhookRouters(server, (_header, payload) => {
+	assignWebhookRouters(server, SECRET, (_header, payload) => {
 		// Execute shell actions only if git pull successes.
 		if (checkGitBranch(payload) && pullFromOrigin()) {
-			ExecuteShellActions(payload);
+			ExecuteShellActions(payload, ACTIONS);
 		}
 	});
 

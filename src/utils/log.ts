@@ -1,17 +1,14 @@
-import { LOG_PATH } from "@/config/config";
-import log4js from "log4js";
 import { join } from "node:path";
+import { LOG_BACKUPS, LOG_DIR, LOG_FILENAME, MAX_LOG_SIZE } from "@/consts/consts";
+import log4js from "log4js";
 
-export const LOG_FILENAME = join(LOG_PATH, "git-auto-deploy.log");
-
-export const MAX_LOG_SIZE = 10485760;
-export const LOG_BACKUPS = 3;
+export const LOG_FILEPATH = join(LOG_DIR, LOG_FILENAME);
 
 const logger = log4js.configure({
 	appenders: {
 		fileAppender: {
 			type: "file",
-			filename: LOG_FILENAME,
+			filename: LOG_FILEPATH,
 			maxLogSize: MAX_LOG_SIZE,
 			backups: LOG_BACKUPS,
 			compress: true,
