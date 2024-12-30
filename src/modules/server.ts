@@ -32,7 +32,10 @@ export const checkPortAvailability = async (): Promise<boolean> => {
  * @param server Express server instance.
  * @param callback Function to call when a webhook is received and passed verification.
  */
-export const assignWebhookRouters = (server: Express, callback: (payload: IGithubWebhookPayload) => void) => {
+export const assignWebhookRouters = (
+	server: Express,
+	callback: (header: IGithubWebhookRequestHeader, payload: IGithubWebhookPayload) => void,
+) => {
 	server.use(express.json());
 	server.use(express.urlencoded({ extended: true }));
 
@@ -118,7 +121,8 @@ export const assignWebhookRouters = (server: Express, callback: (payload: IGithu
 	const applyPayload: Handler = (req, res) => {
 		const header = req.headers as unknown as IGithubWebhookRequestHeader;
 		const payload = req.body as IGithubWebhookPayload;
-		callback(payload);
+		appOutputLogger.info(`Received a webhook ${header["x-github-hook-id"]} passed validation.`);
+		callback(header, payload);
 		res.status(200).send("Success");
 	};
 

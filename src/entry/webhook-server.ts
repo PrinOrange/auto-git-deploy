@@ -23,7 +23,7 @@ export const webhookServer = async () => {
 	const server = express();
 
 	// Assign webhook routers to the server.
-	assignWebhookRouters(server, (payload) => {
+	assignWebhookRouters(server, (_header, payload) => {
 		// Execute shell actions only if git pull successes.
 		if (checkGitBranch(payload) && pullFromOrigin()) {
 			ExecuteShellActions(payload);
