@@ -2,14 +2,28 @@ import { bold, cyan, underline } from "colors";
 import express from "express";
 import { ExecuteShellActions } from "./action";
 import { appOutputLogger } from "./log";
-import { ACTIONS, PORT } from "./config";
+import { ACTIONS, CONFIG_FILEPATH, initConfig, PORT } from "./config";
 import { GitStatus } from "./git";
 import { isPortInUse } from "./libs/port";
 import { assignWebhookRouters } from "./server";
+import { fileExists } from "./libs/file";
 
 const LOCALHOST_ADDRESS = `http:\/\/localhost:${PORT}\/`;
 
 const main = async () => {
+	const args = process.argv.slice(2);
+
+	if (args[0] === "init") {
+		initConfig();
+		process.exit(0);
+	}
+
+	if (!fileExists(CONFIG_FILEPATH)) {
+		console.error("Configuration file does not exist.");
+		console.error("Maybe you should run command 'autodeploy init' first.");
+		process.exit(1);
+	}
+
 	const server = express();
 
 	// Check if git status is null.

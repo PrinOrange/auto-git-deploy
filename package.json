@@ -4,19 +4,20 @@
 	"description": "",
 	"type": "module",
 	"bin": {
-		"auto-deploy": "./dist/index.js"
+		"autodeploy": "./dist/index.js"
 	},
 	"scripts": {
-		"build": "npm run clean && ncc build ./src/app.ts -o dist",
+		"prepare": "pnpm run build:release",
+		"build:debug": "pnpm run clean && ncc build ./src/app.ts -o dist",
+		"build:release": "pnpm run clean && ncc build ./src/app.ts --minify --no-source-map-register -o dist",
 		"format": "biome format --write .",
 		"lint": "biome lint",
 		"lint:fix": "biome lint --fix .",
 		"clean": "tsx ./scripts/clean.ts",
-		"dev": "bun run ./src/app.ts --watch",
-		"test": ""
+		"dev": "bun run ./src/app.ts --watch"
 	},
 	"files": ["dist/", "README.md", "LICENSE"],
-	"keywords": ["github", "webhook", "auto-deploy", "deploy", "git", "O&M", "github-api"],
+	"keywords": ["github", "webhook", "auto-deploy", "github-webhook", "deploy", "git", "O&M", "github-api"],
 	"author": "但为君故",
 	"license": "MIT",
 	"devDependencies": {
