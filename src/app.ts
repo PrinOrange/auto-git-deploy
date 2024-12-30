@@ -49,7 +49,7 @@ const main = async () => {
 	// Assign webhook routers to the server.
 	assignWebhookRouters(server, (payload) => {
 		pullFromOrigin();
-		ExecuteShellActions(payload, ACTIONS);
+		ExecuteShellActions(payload);
 	});
 
 	// Start the server.

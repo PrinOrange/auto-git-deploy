@@ -1,31 +1,24 @@
 import { execSync } from "node:child_process";
-import type { IGitPullResult, IGitStatus } from "./types/git.type";
+import { appOutputLogger } from "./log";
+import type { IGitStatus } from "./types/git.type";
 
 /**
  * Pull updates from the remote.origin of the current Git repository.
  */
-export function pullFromOrigin(): IGitPullResult {
+export function pullFromOrigin() {
 	try {
 		// Fetch remote updates
 		execSync("git fetch origin", { stdio: "inherit" });
 
 		// Pull updates for the current branch
 		const output = execSync("git pull origin", { encoding: "utf-8" });
-		return {
-			success: true,
-			message: output.trim(),
-		};
+		appOutputLogger.info(output.trim());
 	} catch (error) {
 		if (error instanceof Error) {
-			return {
-				success: false,
-				message: `Error pulling from origin: ${error.message}`,
-			};
+			appOutputLogger.error(`Error pulling from origin: ${error.message}`);
+			return;
 		}
-		return {
-			success: false,
-			message: "An unknown error occurred while pulling from origin.",
-		};
+		appOutputLogger.error("An unknown error occurred while pulling from origin.");
 	}
 }
 
