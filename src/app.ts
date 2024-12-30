@@ -3,7 +3,7 @@ import express from "express";
 import { ExecuteShellActions } from "./action";
 import { appOutputLogger } from "./log";
 import { ACTIONS, CONFIG_FILEPATH, initConfig, PORT } from "./config";
-import { GitStatus } from "./git";
+import { GitStatus, pullFromOrigin } from "./git";
 import { isPortInUse } from "./libs/port";
 import { assignWebhookRouters } from "./server";
 import { fileExists } from "./libs/file";
@@ -13,11 +13,16 @@ const LOCALHOST_ADDRESS = `http:\/\/localhost:${PORT}\/`;
 const main = async () => {
 	const args = process.argv.slice(2);
 
+	// Is command for init configuration file.
 	if (args[0] === "init") {
-		initConfig();
+		if (!fileExists(CONFIG_FILEPATH)) {
+			initConfig();
+		}
+		console.error("Configuration file is already existed.");
 		process.exit(0);
 	}
 
+	// Check does the configuration file exist.
 	if (!fileExists(CONFIG_FILEPATH)) {
 		console.error("Configuration file does not exist.");
 		console.error("Maybe you should run command 'autodeploy init' first.");
@@ -43,6 +48,7 @@ const main = async () => {
 
 	// Assign webhook routers to the server.
 	assignWebhookRouters(server, (payload) => {
+		pullFromOrigin();
 		ExecuteShellActions(payload, ACTIONS);
 	});
 
