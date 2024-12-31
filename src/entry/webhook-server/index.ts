@@ -9,11 +9,18 @@ import { executeShells } from "@/utils/action";
 import { logWebhook, processContentType, validateEvent, validateSignature } from "./routers";
 import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "@/types/payload.type";
 import { isPortInUse } from "@/libs/port";
+import pm2 from 'pm2';
 
 export const handleStartWebhookServerCommand = async () => {
 	try {
+		
+		// TODO: Add process management with pm2.
+		pm2.connect((err) => {})
+
 		const gitStatus = getCurrentGitStatus();
-		const { PORT: port, COMMANDS: commands, SECRET: secret } = loadConfig();
+
+		const { PORT: port, AFTER_PULL: commands, SECRET: secret } = loadConfig();
+
 		const routerGenerators = [logWebhook, processContentType, validateEvent, validateSignature];
 
 		if (await isPortInUse(port)) {

@@ -2,15 +2,20 @@
 
 —— 自动拉取 Github 远程仓库更新并部署。
 
-> 试想一个场景：你从 Github 的远程仓库上 Clone 了一个前端项目到自己的服务器上部署（如 next.js）。但是，每次修改仓库中的代码时，你都必须重新登录服务器，在服务器的本地仓库上拉取更新、再重新构建部署。这样实在太麻烦了。
+**NOTE: 本项目目前在 Alpha 测试阶段，请勿在生产环境中使用。**
+
+> 试想一个场景：你从 Github 的远程仓库上 Clone 了一个前端项目到自己的服务器上部署（如 next.js）。但是，每次修改仓库中的代码时，你都必须重新登录服务器，在服务器的本地仓库上拉取更新、再重新构建部署的繁琐步骤。
 
 所以本项目就致力于解决这个问题，它会当你的 Github 仓库代码更新后，不必再手动登录到服务器拉取更新、重新构建、重新部署。
 
-而是会向你的服务器发送通知，让服务器自动从 github 上拉取更新，并自动重新构建、部署流程，让你服务器中的项目时刻与 Github 上的仓库保持更新，省去登录的人工操作流程。
+而是会向你的服务器发送通知，让服务器自动从 github 上拉取更新，并自动重新构建、部署流程，让你服务器中的项目时刻与 Github 上的仓库保持更新，省去人工操作流程。
 
-## 原理
+在项目开始之前，你需要具备以下知识：
 
-在项目开始之前，你需要了解什么是 Github Webhook。
++ 有一定的 Linux 运维操作基础
++ 熟悉 SSL、反向代理的配置
+
+本项目以来的消息通知机制是 Github Webhook。
 
 [Github Webhook](https://docs.github.com/en/webhooks/about-webhooks) 是 Github 提供的一种消息通知机制，允许在仓库发生更新（如 `push` 或 `merge` 操作）时，将更新信息发送到指定的地址。
 
@@ -27,34 +32,39 @@
 
 ![](https://raw.githubusercontent.com/codemetic/pictures-host/main/images1735402197185.webp)
 
-然后填写如下 Github Webhook 信息。注意：Payload URL 中的域名填写你自己的域名。这里假设你的域名为 example.com。其他字段按下图填写即可。在这里，我们只监听仓库的 push 更新事件。
+然后填写如下 Github Webhook 信息。注意：Payload URL 中的域名填写你自己的域名。Secret 字段用于验证 Webhook 来源，在这里假设你的 Secret 为 "yoursecret"。这里假设你的域名为 example.com。其他字段按下图填写即可。在这里，我们只监听仓库的 push 更新事件。
 
 ![](https://raw.githubusercontent.com/codemetic/pictures-host/main/images20241229001440.webp)
 
 首先安装依赖（推荐全局安装）
 
 ```bash
-npm i git-auto-deploy --save-dev # or
-npm i git-auto-deploy -g --save-dev
+npm i auto-git-deploy --save-dev # or
+npm i auto-git-deploy -g --save-dev
 ```
 
-然后转到你的 next.js 项目的根目录，创建 `git-auto-deploy.json`，编写以下配置文件
+然后转到你的 next.js 项目的根目录，初始化配置项
+
+```bash
+autodeploy init
+```
+
+程序会自动在目录下生成 `autodeploy.config.json` 配置文件：
 
 ```json
 {
-  "secret": "your_webhook_secret",
-  "payloadUrl": "/webhook",
-  "port": 3300,
-  "actions": ["pnpm install", "pnpm run build", "pnpm run start"]
+  "PORT": 3300,
+  "COMMANDS": [],
+  "SECRET": null
 }
 ```
 
-其中的 `actions` 字段为拉取到 Github 更新后，依次执行的命令操作。在这里，即重新安装依赖、重新构建再部署。
+其中的 `secret` 字段填入刚才所设置的 “yoursecret”，`command` 字段为拉取到 Github 更新后，依次执行的命令操作。在这里，即重新安装依赖、重新构建再部署。
 
 然后执行，
 
 ```bash
-npx git-auto-deploy
+autodeploy
 ```
 
 它会首先执行一遍 `actions` 里的命令序列。执行完后会提示如下信息：

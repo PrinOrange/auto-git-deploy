@@ -11,7 +11,12 @@ export const createConfig = () => {
 	try {
 		const config: IConfig = {
 			PORT: 3300,
-			COMMANDS: [],
+
+			DEPLOY: "",
+			STOP: null,
+
+			BEFORE_PULL: [],
+			AFTER_PULL: [],
 			SECRET: null,
 		};
 		fs.writeFileSync(CONFIG_FILENAME, JSON.stringify(config, null, 2));
@@ -38,7 +43,12 @@ export const loadConfig = (): IConfig => {
 		const configSchema = z.object({
 			PORT: z.number().default(3000),
 			SECRET: z.string().nullable().default(null),
-			COMMANDS: z.array(z.string()).default([]),
+
+			DEPLOY: z.string().nullable().default(""),
+			STOP: z.string().nullable().default(""),
+
+			BEFORE_PULL: z.array(z.string()).default([]),
+			AFTER_PULL: z.array(z.string()).default([]),
 		});
 
 		// Read and parse the configuration file
