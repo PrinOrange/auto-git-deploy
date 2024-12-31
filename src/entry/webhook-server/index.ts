@@ -1,7 +1,7 @@
 import { ConfigureError } from "@/error/ConfigError";
 import { GitBranchError, GitPullFromOriginError, GitStatusError } from "@/error/GitError";
 import { loadConfig } from "@/utils/config";
-import { checkGitBranch, getCurrentGitStatus, pullFromOrigin } from "@/utils/git";
+import { checkGitBranch, getCurrentGitStatus, pullFromOrigin, resetGitWorkspace as resetGitStatus } from "@/utils/git";
 import { appOutputLogger, webhookOutputLogger } from "@/utils/log";
 import { WebhookServer } from "./server";
 import { ShellExecutionError } from "@/error/ShellError";
@@ -22,6 +22,7 @@ export const handleStartWebhookServerCommand = async () => {
 
 		const onReceiveWebHook = (_header: IGithubWebhookRequestHeader, payload: IGithubWebhookPayload) => {
 			checkGitBranch(payload, gitStatus);
+			resetGitStatus();
 			pullFromOrigin(payload);
 			executeShells(payload, commands);
 		};

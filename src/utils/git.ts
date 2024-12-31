@@ -2,6 +2,7 @@ import { GitBranchError, GitPullFromOriginError, GitStatusError } from "@/error/
 import type { IGitStatus } from "@/types/git.type";
 import type { IGithubWebhookPayload } from "@/types/payload.type";
 import * as shell from "shelljs";
+import { appOutputLogger } from "./log";
 
 export function getCurrentGitStatus(): IGitStatus {
 	const isInsideWorkTreeResult = shell.exec("git rev-parse --is-inside-work-tree", { silent: true });
@@ -49,6 +50,25 @@ export function getCurrentGitStatus(): IGitStatus {
 		isStagingAreaEmpty,
 		unstagedFiles,
 	};
+}
+
+/*
+ * Clean untracked files and restore unstaged changes in a Git repository.
+ * @returns {boolean} - Returns `true` if both commands succeed, `false` otherwise.
+ */
+export function resetGitWorkspace() {
+	// Remove untracked files and directories
+	const cleanResult = shell.exec("git clean -fd", { silent: true });
+	if (cleanResult.code !== 0) {
+		throw new GitStatusError(`Failed to clean untracked files: ${cleanResult.stderr}`);
+	}
+
+	// Restore unstaged changes to the last commit
+	const restoreResult = shell.exec("git restore .", { silent: true });
+	if (restoreResult.code !== 0) {
+		throw new GitStatusError(`Failed to restore unstaged changes: ${restoreResult.stderr}`);
+	}
+	appOutputLogger.info("Git workspace has been reset: untracked files removed and unstaged changes restored.");
 }
 
 export function pullFromOrigin(_payload: IGithubWebhookPayload) {
