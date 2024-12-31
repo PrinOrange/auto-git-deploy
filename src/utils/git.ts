@@ -1,7 +1,7 @@
 import { GitBranchError, GitPullFromOriginError, GitStatusError } from "@/error/GitError";
 import type { IGitStatus } from "@/types/git.type";
 import type { IGithubWebhookPayload } from "@/types/payload.type";
-import shell from "shelljs";
+import * as shell from "shelljs";
 
 export function getCurrentGitStatus(): IGitStatus {
 	const isInsideWorkTreeResult = shell.exec("git rev-parse --is-inside-work-tree", { silent: true });

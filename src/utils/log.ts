@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { LOG_BACKUPS, LOG_DIR, LOG_FILENAME, MAX_LOG_SIZE } from "@/consts/consts";
-import log4js from "log4js";
+import * as log4js from "log4js";
 
 export const LOG_FILEPATH = join(LOG_DIR, LOG_FILENAME);
 

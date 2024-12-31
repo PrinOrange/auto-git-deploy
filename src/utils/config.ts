@@ -3,8 +3,8 @@ import { ConfigureError } from "@/error/ConfigError";
 import { fileExists } from "@/libs/file";
 import type { IConfig } from "@/types/config.type";
 import { bold } from "colors";
-import fs from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { z } from "zod";
 
 export const createConfig = () => {
@@ -30,7 +30,7 @@ export const loadConfig = (): IConfig => {
 		// Check if configuration file exists
 		if (!fileExists(CONFIG_FILENAME)) {
 			throw new ConfigureError(
-				`Configuration file does not exist. Maybe you should run command 'autodeploy init' first.`,
+				"Configuration file does not exist. Maybe you should run command 'autodeploy init' first.",
 			);
 		}
 
@@ -48,7 +48,6 @@ export const loadConfig = (): IConfig => {
 	} catch (error) {
 		// Handle schema validation errors
 		if (error instanceof z.ZodError) {
-			console.error("Configuration validation failed.");
 			throw new ConfigureError(error.errors.map((err) => `- ${err.path.join(".")}: ${err.message}`).join("\n"));
 		}
 		if (error instanceof ConfigureError) {
