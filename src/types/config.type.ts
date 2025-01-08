@@ -1,10 +1,10 @@
 export interface IConfig {
-	PORT: number;
-	SECRET: string | null;
+	port: number;
+	secret: string | null;
 
-	DEPLOY: string;
-	STOP: string;
+	deploy: string;
+	stop: string;
 
-	BEFORE_PULL: string[];
-	AFTER_PULL: string[];
+	beforePull: string[];
+	afterPull: string[];
 }

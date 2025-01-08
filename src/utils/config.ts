@@ -10,14 +10,14 @@ import { z } from "zod";
 export const createConfig = () => {
 	try {
 		const config: IConfig = {
-			PORT: 3300,
+			port: 3300,
 
-			DEPLOY: "",
-			STOP: "",
+			deploy: "",
+			stop: "",
 
-			BEFORE_PULL: [],
-			AFTER_PULL: [],
-			SECRET: null,
+			beforePull: [],
+			afterPull: [],
+			secret: null,
 		};
 		fs.writeFileSync(CONFIG_FILENAME, JSON.stringify(config, null, 2));
 		console.log(`Configuration file is saved at ${path.resolve(CONFIG_FILENAME)}.`);
@@ -41,14 +41,14 @@ export const loadConfig = (): IConfig => {
 
 		// Define the schema
 		const configSchema = z.object({
-			PORT: z.number().default(3000),
-			SECRET: z.string().nullable().default(null),
+			port: z.number().default(3000),
+			secret: z.string().nullable().default(null),
 
-			DEPLOY: z.string().default(""),
-			STOP: z.string().default(""),
+			deploy: z.string().default(""),
+			stop: z.string().default(""),
 
-			BEFORE_PULL: z.array(z.string()).default([]),
-			AFTER_PULL: z.array(z.string()).default([]),
+			beforePull: z.array(z.string()).default([]),
+			afterPull: z.array(z.string()).default([]),
 		});
 
 		// Read and parse the configuration file

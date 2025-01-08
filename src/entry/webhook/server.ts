@@ -29,7 +29,7 @@ export class WebhookServer {
 			res.send("pong");
 		});
 
-		const LOCALHOST_ADDRESS = `http://localhost:${this.config.PORT}`;
+		const LOCALHOST_ADDRESS = `http://localhost:${this.config.port}`;
 
 		appOutputLogger.info(`Server started at ${LOCALHOST_ADDRESS}`);
 
@@ -40,7 +40,7 @@ export class WebhookServer {
 		console.log(`${bold("Server PID:")} ${process.pid}, ${bold("Runtime version:")} ${process.version}`);
 		console.log("Next, use reverse proxy (such as nginx) to map your domain name to this address.");
 
-		this.server.listen(this.config.PORT);
+		this.server.listen(this.config.port);
 
 		return this;
 	}

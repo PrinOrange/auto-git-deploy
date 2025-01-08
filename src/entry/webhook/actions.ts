@@ -44,13 +44,13 @@ export const checkGitStatus: WebhookRouter = (gitStatus, config) => (req, res) =
 
 export const executeStopCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
-	executeShells(payload, [config.STOP]);
+	executeShells(payload, [config.stop]);
 	next();
 };
 
 export const executeBeforePullCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
-	executeShells(payload, config.BEFORE_PULL);
+	executeShells(payload, config.beforePull);
 	next();
 };
 
@@ -62,12 +62,12 @@ export const executePullFormOriginCommand: WebhookRouter = (gitStatus, config) =
 
 export const executeAfterPullCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
-	executeShells(payload, config.BEFORE_PULL);
+	executeShells(payload, config.beforePull);
 	next();
 };
 
 export const executeDeployCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
-	executeShells(payload, [config.DEPLOY]);
+	executeShells(payload, [config.deploy]);
 	next();
 };

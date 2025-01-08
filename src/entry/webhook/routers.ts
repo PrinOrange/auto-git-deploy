@@ -65,11 +65,11 @@ export const validateSignature: WebhookRouter = (gitStatus, config) => (req, res
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	const signature = header["x-hub-signature-256"]?.toString() || "";
 	const payload = req.body;
-	if (config.SECRET == null) {
+	if (config.secret == null) {
 		next(); // Skip signature verification if secret is not set.
 		return;
 	}
-	if (!verifyGithubWebhook(payload, config.SECRET, signature)) {
+	if (!verifyGithubWebhook(payload, config.secret, signature)) {
 		webhookOutputLogger.error("Received invalid signature from GitHub webhook.");
 		webhookOutputLogger.error("Signature:", signature);
 		webhookOutputLogger.error("Suspect this request is not from GitHub official webhook.");

@@ -11,7 +11,7 @@ export function isInGitRepo() {
 	return true;
 }
 
-export function getCurrentGitStatus(): IGitStatus {
+export function getGitStatus(): IGitStatus {
 	const rawRemoteOriginURLResult = shell.exec("git config --get remote.origin.url", { silent: true });
 	if (rawRemoteOriginURLResult.code !== 0 || rawRemoteOriginURLResult.code !== 0) {
 		throw new GitStatusError(`Can not detect remote origin repository: ${rawRemoteOriginURLResult.stderr}`);

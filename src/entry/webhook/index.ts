@@ -1,7 +1,7 @@
 import { ConfigureError } from "@/error/ConfigError";
 import { isPortInUse } from "@/libs/port";
 import { loadConfig } from "@/utils/config";
-import { getCurrentGitStatus } from "@/utils/git";
+import { getGitStatus } from "@/utils/git";
 import {
 	checkGitBranch,
 	checkGitStatus,
@@ -15,17 +15,14 @@ import { logWebhook, validateContentType, validateEvent, validateSignature } fro
 import { WebhookServer } from "./server";
 
 export const handleStartWebhookServerEntry = async () => {
-	const gitStatus = getCurrentGitStatus();
-
+	const gitStatus = getGitStatus();
 	const config = loadConfig();
 
-	if (await isPortInUse(config.PORT)) {
-		throw new ConfigureError(`The port ${config.PORT} is already in use. Please try another port.`);
+	if (await isPortInUse(config.port)) {
+		throw new ConfigureError(`The port ${config.port} is already in use. Please try another port.`);
 	}
 
-	const webHookServer = new WebhookServer(gitStatus, config);
-
-	webHookServer
+	new WebhookServer(gitStatus, config)
 		// Use request middlewares
 		.useRouter(logWebhook)
 		.useRouter(validateContentType)
