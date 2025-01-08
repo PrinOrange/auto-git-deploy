@@ -2,7 +2,6 @@ import { CONFIG_FILENAME } from "@/consts/consts";
 import { ConfigureError } from "@/error/ConfigError";
 import { fileExists } from "@/libs/file";
 import type { IConfig } from "@/types/config.type";
-import { bold } from "colors";
 import * as fs from "node:fs";
 import * as path from "node:path";
 import { z } from "zod";
@@ -11,20 +10,14 @@ export const createConfig = () => {
 	try {
 		const config: IConfig = {
 			port: 3300,
-
 			deploy: "",
 			stop: "",
-
 			beforePull: "",
 			afterPull: "",
 			secret: null,
 		};
 		fs.writeFileSync(CONFIG_FILENAME, JSON.stringify(config, null, 2));
 		console.log(`Configuration file is saved at ${path.resolve(CONFIG_FILENAME)}.`);
-		console.log("Now please edit it to set configuration.");
-		console.log(
-			`${bold("DON NOT FORGET ADD FILE `autodeploy.config.json` AND directory `.autodeploy` TO .gitignore MANUALLY.")}`,
-		);
 	} catch (error) {
 		throw new ConfigureError(`Error in setting configuration file ${CONFIG_FILENAME}: ${error}`);
 	}
