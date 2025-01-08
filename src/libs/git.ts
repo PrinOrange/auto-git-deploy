@@ -1,7 +1,7 @@
 import { GitPullFromOriginError, GitStatusError } from "@/error/GitError";
 import type { IGitStatus } from "@/types/git.type";
 import * as shell from "shelljs";
-import { appOutputLogger } from "./log";
+import { appOutputLogger } from "../utils/log";
 
 export function isInGitRepo() {
 	const isInsideWorkTree = shell.exec("git rev-parse --is-inside-work-tree", { silent: true });
@@ -67,6 +67,11 @@ export function resetGitWorkspace() {
 		throw new GitStatusError(`Failed to restore unstaged changes: ${restoreResult.stderr}`);
 	}
 	appOutputLogger.info("Git workspace has been reset: untracked files removed and unstaged changes restored.");
+}
+
+export function isFileIgnoredByGit(filePath: string): boolean {
+	const result = shell.exec(`git check-ignore ${filePath}`, { silent: true });
+	return result.code === 0 && result.stdout.trim().length > 0;
 }
 
 export function pullFromOrigin() {

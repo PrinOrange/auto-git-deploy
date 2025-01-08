@@ -1,8 +1,8 @@
 import { GitBranchError } from "@/error/GitError";
 import type { IGithubWebhookPayload } from "@/types/payload.type";
 import type { WebhookRouter } from "@/types/router.type";
-import { executeShells } from "@/utils/action";
-import { pullFromOrigin } from "@/utils/git";
+import { executeShells } from "@/libs/shell";
+import { pullFromOrigin } from "@/libs/git";
 
 export const checkGitBranch: WebhookRouter = (gitStatus, config) => (req, res) => {
 	const payload = req.body as IGithubWebhookPayload;

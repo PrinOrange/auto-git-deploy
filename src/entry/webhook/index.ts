@@ -1,7 +1,7 @@
 import { ConfigureError } from "@/error/ConfigError";
 import { isPortInUse } from "@/libs/port";
 import { loadConfig } from "@/utils/config";
-import { getGitStatus } from "@/utils/git";
+import { getGitStatus } from "@/libs/git";
 import {
 	checkGitBranch,
 	checkGitStatus,
@@ -11,10 +11,10 @@ import {
 	executePullFormOriginCommand,
 	executeStopCommand,
 } from "./actions";
-import { logWebhook, validateContentType, validateEvent, validateSignature } from "./routers";
+import { logWebhookRequest, validateContentType, validateEvent, validateSignature } from "./routers";
 import { WebhookServer } from "./server";
 
-export const handleStartWebhookServerEntry = async () => {
+export const StartEntry = async () => {
 	const gitStatus = getGitStatus();
 	const config = loadConfig();
 
@@ -24,7 +24,7 @@ export const handleStartWebhookServerEntry = async () => {
 
 	new WebhookServer(gitStatus, config)
 		// Use request middlewares
-		.useRouter(logWebhook)
+		.useRouter(logWebhookRequest)
 		.useRouter(validateContentType)
 		.useRouter(validateEvent)
 		.useRouter(validateSignature)

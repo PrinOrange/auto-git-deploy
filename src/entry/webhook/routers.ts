@@ -1,10 +1,10 @@
 import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "@/types/payload.type";
 import type { WebhookRouter } from "@/types/router.type";
-import { verifyGithubWebhook } from "@/utils/crypto";
+import { verifyRequestSignature } from "@/libs/crypto";
 import { webhookOutputLogger } from "@/utils/log";
 
 // Middleware for logging webhook information.
-export const logWebhook: WebhookRouter = () => (req, _res, next) => {
+export const logWebhookRequest: WebhookRouter = () => (req, _res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	const payload = req.body as IGithubWebhookPayload;
 
@@ -61,7 +61,7 @@ export const validateEvent: WebhookRouter = () => (req, res, next) => {
 // And only changes for master-branch will be passed.
 
 // Middleware for validating signature from github webhook.
-export const validateSignature: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+export const validateSignature: WebhookRouter = (_, config) => (req, res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	const signature = header["x-hub-signature-256"]?.toString() || "";
 	const payload = req.body;
@@ -69,7 +69,7 @@ export const validateSignature: WebhookRouter = (gitStatus, config) => (req, res
 		next(); // Skip signature verification if secret is not set.
 		return;
 	}
-	if (!verifyGithubWebhook(payload, config.secret, signature)) {
+	if (!verifyRequestSignature(payload, config.secret, signature)) {
 		webhookOutputLogger.error("Received invalid signature from GitHub webhook.");
 		webhookOutputLogger.error("Signature:", signature);
 		webhookOutputLogger.error("Suspect this request is not from GitHub official webhook.");
@@ -81,9 +81,8 @@ export const validateSignature: WebhookRouter = (gitStatus, config) => (req, res
 	next();
 };
 
-export const logPassedWebhook: WebhookRouter = (secret) => (req, res, next) => {
+export const logPassedWebhook: WebhookRouter = () => (req, _, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
-	const payload = req.body as IGithubWebhookPayload;
 	webhookOutputLogger.info(`Received a webhook ${header["x-github-hook-id"]} passed validation.`);
 	next();
 };

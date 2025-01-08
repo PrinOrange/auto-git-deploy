@@ -1,28 +1,24 @@
-import { handleInitCommand } from "@/entry/config-init";
-import { handleStartWebhookServerEntry } from "@/entry/webhook";
-
-enum Command {
-	INIT = "init",
-	DEFAULT = "",
-	START = "start",
-}
+import { InitEntry } from "@/entry/init";
+import { StartEntry } from "@/entry/webhook";
+import { Command, readProgramArgs } from "./utils/args";
+import { precheck } from "./utils/precheck";
 
 const main = async () => {
-	const args = process.argv.slice(2);
-	const command = (args[0]?.trim() ?? "") as Command;
+	precheck();
+	const command = readProgramArgs();
 
-	switch (command) {
+	switch (readProgramArgs()) {
 		case Command.DEFAULT:
-			await handleStartWebhookServerEntry();
+			await StartEntry();
 			break;
 		case Command.START:
-			await handleStartWebhookServerEntry();
+			await StartEntry();
 			break;
 		case Command.INIT:
-			handleInitCommand();
+			InitEntry();
 			break;
 		default:
-			console.error(`Unknown option: ${command}`);
+			console.error(`Unknown command: ${command}`);
 			process.exit(1);
 	}
 };

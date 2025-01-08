@@ -8,6 +8,7 @@
 		"libc",
 		"minimatch",
 		"nosniff",
+		"precheck",
 		"privkey",
 		"redir",
 		"shelljs",

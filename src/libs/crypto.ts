@@ -1,14 +1,14 @@
 import crypto from "node:crypto";
-import type { IGithubWebhookPayload } from "@/types/payload.type";
 
 /**
  * Verify GitHub webhook signature
  * @param secret - The GitHub webhook secret.
- * @param payload - The raw body of the webhook request (as a string).
+ * @param requestBody - The raw body of the webhook request (as a string).
  * @param signature - The value of the `X-Hub-Signature-256` header.
  * @returns `true` if the signature is valid, otherwise `false`.
  */
-export function verifyGithubWebhook(payload: IGithubWebhookPayload, secret: string, signature: string): boolean {
+// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+export function verifyRequestSignature(requestBody: any, secret: string, signature: string): boolean {
 	if (secret == null) {
 		return true;
 	}
@@ -22,7 +22,7 @@ export function verifyGithubWebhook(payload: IGithubWebhookPayload, secret: stri
 
 		// Create HMAC using the secret and the payload
 		const hmac = crypto.createHmac("sha256", secret);
-		hmac.update(JSON.stringify(payload), "utf-8");
+		hmac.update(JSON.stringify(requestBody), "utf-8");
 		const digest = hmac.digest("hex");
 
 		// Compare the calculated digest with the signature in a timing-safe way
