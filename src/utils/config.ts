@@ -13,7 +13,7 @@ export const createConfig = () => {
 			PORT: 3300,
 
 			DEPLOY: "",
-			STOP: null,
+			STOP: "",
 
 			BEFORE_PULL: [],
 			AFTER_PULL: [],
@@ -44,8 +44,8 @@ export const loadConfig = (): IConfig => {
 			PORT: z.number().default(3000),
 			SECRET: z.string().nullable().default(null),
 
-			DEPLOY: z.string().nullable().default(""),
-			STOP: z.string().nullable().default(""),
+			DEPLOY: z.string().default(""),
+			STOP: z.string().default(""),
 
 			BEFORE_PULL: z.array(z.string()).default([]),
 			AFTER_PULL: z.array(z.string()).default([]),

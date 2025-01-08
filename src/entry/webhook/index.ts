@@ -9,17 +9,20 @@ import { executeShells } from "@/utils/action";
 import { logWebhook, processContentType, validateEvent, validateSignature } from "./routers";
 import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "@/types/payload.type";
 import { isPortInUse } from "@/libs/port";
-import pm2 from 'pm2';
+import { ProcessError } from "@/error/ProcessError";
 
-export const handleStartWebhookServerCommand = async () => {
+export const handleStartWebhookServerEntry = async () => {
 	try {
-		
-		// TODO: Add process management with pm2.
-		pm2.connect((err) => {})
-
 		const gitStatus = getCurrentGitStatus();
 
-		const { PORT: port, AFTER_PULL: commands, SECRET: secret } = loadConfig();
+		const {
+			PORT: port,
+			BEFORE_PULL: beforePullCommands,
+			AFTER_PULL: afterPullCommands,
+			STOP: stopCommand,
+			DEPLOY: deployCommand,
+			SECRET: secret,
+		} = loadConfig();
 
 		const routerGenerators = [logWebhook, processContentType, validateEvent, validateSignature];
 
@@ -29,27 +32,38 @@ export const handleStartWebhookServerCommand = async () => {
 
 		const onReceiveWebHook = (_header: IGithubWebhookRequestHeader, payload: IGithubWebhookPayload) => {
 			checkGitBranch(payload, gitStatus);
+
 			resetGitStatus();
+
+			executeShells(payload, [stopCommand]);
+
+			executeShells(payload, beforePullCommands);
+
 			pullFromOrigin(payload);
-			executeShells(payload, commands);
+
+			executeShells(payload, afterPullCommands);
+
+			executeShells(payload, [deployCommand]);
 		};
 
-		const webHookServer = new WebhookServer(gitStatus, port, secret, routerGenerators, onReceiveWebHook);
+		const webHookServer = new WebhookServer(gitStatus, port, secret);
 
 		webHookServer.start();
 	} catch (error) {
 		if (error instanceof GitStatusError) {
-			appOutputLogger.error(error.message);
+			appOutputLogger.error(error);
 			process.exit(1);
 		} else if (error instanceof ConfigureError) {
-			appOutputLogger.error(error.message);
+			appOutputLogger.error(error);
 			process.exit(1);
 		} else if (error instanceof GitBranchError) {
-			webhookOutputLogger.error(error.message);
+			webhookOutputLogger.error(error);
 		} else if (error instanceof GitPullFromOriginError) {
-			webhookOutputLogger.error(error.message);
+			webhookOutputLogger.error(error);
 		} else if (error instanceof ShellExecutionError) {
-			appOutputLogger.error(error.message, error.stderr, error.stdout);
+			appOutputLogger.error(error);
+		} else if (error instanceof ProcessError) {
+			appOutputLogger.error(error);
 		} else {
 			appOutputLogger.error("Unknown error, failed to start webhook server.", error);
 			process.exit(1);

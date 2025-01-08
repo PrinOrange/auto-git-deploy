@@ -1,10 +1,10 @@
 import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "@/types/payload.type";
-import type { RouterGenerator } from "@/types/router.type";
+import type { WebhookRouter } from "@/types/router.type";
 import { verifyGithubWebhook } from "@/utils/crypto";
 import { webhookOutputLogger } from "@/utils/log";
 
 // Middleware for logging webhook information.
-export const logWebhook: RouterGenerator = () => (req, _res, next) => {
+export const logWebhook: WebhookRouter = () => (req, _res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	const payload = req.body as IGithubWebhookPayload;
 
@@ -18,7 +18,7 @@ export const logWebhook: RouterGenerator = () => (req, _res, next) => {
 };
 
 // Middleware for processing request body of webhook.
-export const processContentType: RouterGenerator = () => (req, res, next) => {
+export const processContentType: WebhookRouter = () => (req, res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	try {
 		if (header["content-type"].toLocaleLowerCase() === "application/x-www-form-urlencoded") {
@@ -45,7 +45,7 @@ export const processContentType: RouterGenerator = () => (req, res, next) => {
 };
 
 // Middleware for validating event type of webhook.
-export const validateEvent: RouterGenerator = () => (req, res, next) => {
+export const validateEvent: WebhookRouter = () => (req, res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	if (header["x-github-event"] !== "push") {
 		webhookOutputLogger.error(`Event ${header["x-github-event"]} is not supported. Only push event is supported.`);
@@ -61,7 +61,7 @@ export const validateEvent: RouterGenerator = () => (req, res, next) => {
 // And only changes for master-branch will be passed.
 
 // Middleware for validating signature from github webhook.
-export const validateSignature: RouterGenerator = (secret) => (req, res, next) => {
+export const validateSignature: WebhookRouter = (secret) => (req, res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	const signature = header["x-hub-signature-256"]?.toString() || "";
 	const payload = req.body;
@@ -79,4 +79,10 @@ export const validateSignature: RouterGenerator = (secret) => (req, res, next) =
 		return;
 	}
 	next();
+};
+
+export const logPassedWebhook: WebhookRouter = (secret) => (req, res, next) => {
+	const header = req.headers as unknown as IGithubWebhookRequestHeader;
+	const payload = req.body as IGithubWebhookPayload;
+	webhookOutputLogger.info(`Received a webhook ${header["x-github-hook-id"]} passed validation.`);
 };

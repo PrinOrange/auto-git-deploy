@@ -1,5 +1,5 @@
 import { handleInitCommand } from "@/entry/config-init";
-import { handleStartWebhookServerCommand } from "@/entry/webhook-server";
+import { handleStartWebhookServerEntry } from "@/entry/webhook";
 
 enum Command {
 	INIT = "init",
@@ -13,10 +13,10 @@ const main = async () => {
 
 	switch (command) {
 		case Command.DEFAULT:
-			await handleStartWebhookServerCommand();
+			await handleStartWebhookServerEntry();
 			break;
 		case Command.START:
-			await handleStartWebhookServerCommand();
+			await handleStartWebhookServerEntry();
 			break;
 		case Command.INIT:
 			handleInitCommand();

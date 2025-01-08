@@ -4,15 +4,15 @@ import type { IGithubWebhookPayload } from "@/types/payload.type";
 import * as shell from "shelljs";
 import { appOutputLogger } from "./log";
 
-export function getCurrentGitStatus(): IGitStatus {
-	const isInsideWorkTreeResult = shell.exec("git rev-parse --is-inside-work-tree", { silent: true });
-
-	if (isInsideWorkTreeResult.code !== 0 || isInsideWorkTreeResult.stdout.trim() !== "true") {
-		throw new GitStatusError(
-			"Can not detect current git status. Maybe you should init or reset the local git repository and add remote origin repository.",
-		);
+export function isInGitRepo() {
+	const isInsideWorkTree = shell.exec("git rev-parse --is-inside-work-tree", { silent: true });
+	if (isInsideWorkTree.code !== 0 || isInsideWorkTree.stdout.trim() !== "true") {
+		return false;
 	}
+	return true;
+}
 
+export function getCurrentGitStatus(): IGitStatus {
 	const rawRemoteOriginURLResult = shell.exec("git config --get remote.origin.url", { silent: true });
 	if (rawRemoteOriginURLResult.code !== 0 || rawRemoteOriginURLResult.code !== 0) {
 		throw new GitStatusError(`Can not detect remote origin repository: ${rawRemoteOriginURLResult.stderr}`);
@@ -98,7 +98,9 @@ export function checkGitBranch(payload: IGithubWebhookPayload, GitStatus: IGitSt
 	// Check whether current git branch is master branch.
 	if (GitStatus!.currentBranch !== masterBranch) {
 		throw new GitBranchError(
-			`Current branch ${GitStatus!.currentBranch} is not the default branch. Your should checkout the branch ${masterBranch} manually.`,
+			`Current branch ${
+				GitStatus!.currentBranch
+			} is not the default branch. Your should checkout the branch ${masterBranch} manually.`,
 		);
 	}
 	// Check whether the changes received is for master branch.
