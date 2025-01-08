@@ -4,7 +4,7 @@ import { Command, readProgramArgs } from "./utils/args";
 import { precheck } from "./utils/precheck";
 
 const main = async () => {
-	precheck();
+	// precheck();
 	const command = readProgramArgs();
 
 	switch (readProgramArgs()) {
