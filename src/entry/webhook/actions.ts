@@ -1,26 +1,11 @@
 import { GitBranchError } from "@/error/GitError";
-import type { WebhookAction } from "@/types/router.type";
+import type { IGithubWebhookPayload } from "@/types/payload.type";
+import type { WebhookRouter } from "@/types/router.type";
 import { executeShells } from "@/utils/action";
+import { pullFromOrigin } from "@/utils/git";
 
-export const checkGitBranch: WebhookAction = (header, payload, GitStatus) => {
-	const masterBranch = payload.repository.master_branch;
-	// Check whether current git branch is master branch.
-	if (GitStatus!.currentBranch !== masterBranch) {
-		throw new GitBranchError(
-			`Current branch ${
-				GitStatus!.currentBranch
-			} is not the default branch. Your should checkout the branch ${masterBranch} manually.`,
-		);
-	}
-	// Check whether the changes received is for master branch.
-	if (payload.ref !== `refs/heads/${masterBranch}` && payload.ref !== masterBranch) {
-		throw new GitBranchError(
-			`Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}. So this push event will be ignored.`,
-		);
-	}
-};
-
-export const checkGitStatus: WebhookAction = (header, payload, gitStatus) => {
+export const checkGitBranch: WebhookRouter = (gitStatus, config) => (req, res) => {
+	const payload = req.body as IGithubWebhookPayload;
 	const masterBranch = payload.repository.master_branch;
 	// Check whether current git branch is master branch.
 	if (gitStatus!.currentBranch !== masterBranch) {
@@ -38,6 +23,51 @@ export const checkGitStatus: WebhookAction = (header, payload, gitStatus) => {
 	}
 };
 
-export const executeStopCommand: WebhookAction = (header, payload, gitStatus, config) => {
+export const checkGitStatus: WebhookRouter = (gitStatus, config) => (req, res) => {
+	const payload = req.body as IGithubWebhookPayload;
+	const masterBranch = payload.repository.master_branch;
+	// Check whether current git branch is master branch.
+	if (gitStatus!.currentBranch !== masterBranch) {
+		throw new GitBranchError(
+			`Current branch ${
+				gitStatus!.currentBranch
+			} is not the default branch. Your should checkout the branch ${masterBranch} manually.`,
+		);
+	}
+	// Check whether the changes received is for master branch.
+	if (payload.ref !== `refs/heads/${masterBranch}` && payload.ref !== masterBranch) {
+		throw new GitBranchError(
+			`Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}. So this push event will be ignored.`,
+		);
+	}
+};
+
+export const executeStopCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+	const payload = req.body as IGithubWebhookPayload;
 	executeShells(payload, [config.STOP]);
+	next();
+};
+
+export const executeBeforePullCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+	const payload = req.body as IGithubWebhookPayload;
+	executeShells(payload, config.BEFORE_PULL);
+	next();
+};
+
+export const executePullFormOriginCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+	const payload = req.body as IGithubWebhookPayload;
+	pullFromOrigin();
+	next();
+};
+
+export const executeAfterPullCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+	const payload = req.body as IGithubWebhookPayload;
+	executeShells(payload, config.BEFORE_PULL);
+	next();
+};
+
+export const executeDeployCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+	const payload = req.body as IGithubWebhookPayload;
+	executeShells(payload, [config.DEPLOY]);
+	next();
 };

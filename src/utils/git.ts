@@ -1,6 +1,5 @@
-import { GitBranchError, GitPullFromOriginError, GitStatusError } from "@/error/GitError";
+import { GitPullFromOriginError, GitStatusError } from "@/error/GitError";
 import type { IGitStatus } from "@/types/git.type";
-import type { IGithubWebhookPayload } from "@/types/payload.type";
 import * as shell from "shelljs";
 import { appOutputLogger } from "./log";
 
@@ -54,7 +53,6 @@ export function getCurrentGitStatus(): IGitStatus {
 
 /*
  * Clean untracked files and restore unstaged changes in a Git repository.
- * @returns {boolean} - Returns `true` if both commands succeed, `false` otherwise.
  */
 export function resetGitWorkspace() {
 	// Remove untracked files and directories
@@ -71,7 +69,7 @@ export function resetGitWorkspace() {
 	appOutputLogger.info("Git workspace has been reset: untracked files removed and unstaged changes restored.");
 }
 
-export function pullFromOrigin(_payload: IGithubWebhookPayload) {
+export function pullFromOrigin() {
 	const fetchResult = shell.exec("git fetch origin", { silent: true });
 	if (fetchResult.code !== 0) {
 		throw new GitPullFromOriginError(

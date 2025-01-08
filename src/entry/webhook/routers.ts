@@ -18,7 +18,7 @@ export const logWebhook: WebhookRouter = () => (req, _res, next) => {
 };
 
 // Middleware for processing request body of webhook.
-export const processContentType: WebhookRouter = () => (req, res, next) => {
+export const validateContentType: WebhookRouter = () => (req, res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	try {
 		if (header["content-type"].toLocaleLowerCase() === "application/x-www-form-urlencoded") {
@@ -61,15 +61,15 @@ export const validateEvent: WebhookRouter = () => (req, res, next) => {
 // And only changes for master-branch will be passed.
 
 // Middleware for validating signature from github webhook.
-export const validateSignature: WebhookRouter = (secret) => (req, res, next) => {
+export const validateSignature: WebhookRouter = (gitStatus, config) => (req, res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	const signature = header["x-hub-signature-256"]?.toString() || "";
 	const payload = req.body;
-	if (secret == null) {
+	if (config.SECRET == null) {
 		next(); // Skip signature verification if secret is not set.
 		return;
 	}
-	if (!verifyGithubWebhook(payload, secret, signature)) {
+	if (!verifyGithubWebhook(payload, config.SECRET, signature)) {
 		webhookOutputLogger.error("Received invalid signature from GitHub webhook.");
 		webhookOutputLogger.error("Signature:", signature);
 		webhookOutputLogger.error("Suspect this request is not from GitHub official webhook.");

@@ -1,7 +1,6 @@
 import type { IConfig } from "@/types/config.type";
 import type { IGitStatus } from "@/types/git.type";
-import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "@/types/payload.type";
-import type { WebhookAction, WebhookRouter } from "@/types/router.type";
+import type { WebhookRouter } from "@/types/router.type";
 import { appOutputLogger } from "@/utils/log";
 import { bold, cyan, underline } from "colors";
 import express from "express";
@@ -20,20 +19,7 @@ export class WebhookServer {
 	}
 
 	useRouter(webhookRouter: WebhookRouter): WebhookServer {
-		this.server.post("/", (req, res, next) => {
-			webhookRouter(this.config.SECRET);
-			next();
-		});
-		return this;
-	}
-
-	useAction(event: WebhookAction) {
-		this.server.post("/", (req, res, next) => {
-			const header = req.headers as unknown as IGithubWebhookRequestHeader;
-			const payload = req.body as IGithubWebhookPayload;
-			event(header, payload, this.gitStatus, this.config);
-			next();
-		});
+		this.server.post("/", webhookRouter(this.gitStatus, this.config));
 		return this;
 	}
 
