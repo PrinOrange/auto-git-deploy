@@ -1,10 +1,10 @@
 import { GitBranchError } from "@/error/GitError";
 import type { IGithubWebhookPayload } from "@/types/payload.type";
 import type { WebhookRouter } from "@/types/router.type";
-import { executeShells } from "@/libs/shell";
+import { executeShell } from "@/libs/shell";
 import { pullFromOrigin } from "@/libs/git";
 
-export const checkGitBranch: WebhookRouter = (gitStatus, config) => (req, res) => {
+export const checkGitBranch: WebhookRouter = (gitStatus, _) => (req, res) => {
 	const payload = req.body as IGithubWebhookPayload;
 	const masterBranch = payload.repository.master_branch;
 	// Check whether current git branch is master branch.
@@ -23,7 +23,7 @@ export const checkGitBranch: WebhookRouter = (gitStatus, config) => (req, res) =
 	}
 };
 
-export const checkGitStatus: WebhookRouter = (gitStatus, config) => (req, res) => {
+export const checkGitStatus: WebhookRouter = (gitStatus, _) => (req, res) => {
 	const payload = req.body as IGithubWebhookPayload;
 	const masterBranch = payload.repository.master_branch;
 	// Check whether current git branch is master branch.
@@ -42,32 +42,32 @@ export const checkGitStatus: WebhookRouter = (gitStatus, config) => (req, res) =
 	}
 };
 
-export const executeStopCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+export const executeStopCommand: WebhookRouter = (_, config) => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
-	executeShells(payload, [config.stop]);
+	executeShell(payload, config.stop);
 	next();
 };
 
-export const executeBeforePullCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+export const executeBeforePullCommand: WebhookRouter = (_, config) => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
-	executeShells(payload, config.beforePull);
+	executeShell(payload, config.beforePull);
 	next();
 };
 
-export const executePullFormOriginCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+export const executePullFormOriginCommand: WebhookRouter = () => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
 	pullFromOrigin();
 	next();
 };
 
-export const executeAfterPullCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+export const executeAfterPullCommand: WebhookRouter = (_, config) => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
-	executeShells(payload, config.beforePull);
+	executeShell(payload, config.beforePull);
 	next();
 };
 
-export const executeDeployCommand: WebhookRouter = (gitStatus, config) => (req, res, next) => {
+export const executeDeployCommand: WebhookRouter = (_, config) => (req, res, next) => {
 	const payload = req.body as IGithubWebhookPayload;
-	executeShells(payload, [config.deploy]);
+	executeShell(payload, config.deploy);
 	next();
 };

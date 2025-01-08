@@ -15,8 +15,8 @@ export const createConfig = () => {
 			deploy: "",
 			stop: "",
 
-			beforePull: [],
-			afterPull: [],
+			beforePull: "",
+			afterPull: "",
 			secret: null,
 		};
 		fs.writeFileSync(CONFIG_FILENAME, JSON.stringify(config, null, 2));
@@ -47,8 +47,8 @@ export const loadConfig = (): IConfig => {
 			deploy: z.string().default(""),
 			stop: z.string().default(""),
 
-			beforePull: z.array(z.string()).default([]),
-			afterPull: z.array(z.string()).default([]),
+			beforePull: z.string().default(""),
+			afterPull: z.string().default(""),
 		});
 
 		// Read and parse the configuration file

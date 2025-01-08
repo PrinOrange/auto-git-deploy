@@ -5,6 +5,6 @@ export interface IConfig {
 	deploy: string;
 	stop: string;
 
-	beforePull: string[];
-	afterPull: string[];
+	beforePull: string;
+	afterPull: string;
 }
