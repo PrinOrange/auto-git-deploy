@@ -85,4 +85,5 @@ export const logPassedWebhook: WebhookRouter = (secret) => (req, res, next) => {
 	const header = req.headers as unknown as IGithubWebhookRequestHeader;
 	const payload = req.body as IGithubWebhookPayload;
 	webhookOutputLogger.info(`Received a webhook ${header["x-github-hook-id"]} passed validation.`);
+	next();
 };

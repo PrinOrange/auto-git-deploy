@@ -1,43 +1,49 @@
+import type { IConfig } from "@/types/config.type";
 import type { IGitStatus } from "@/types/git.type";
 import type { IGithubWebhookPayload, IGithubWebhookRequestHeader } from "@/types/payload.type";
-import type { WebhookEvent, WebhookRouter } from "@/types/router.type";
+import type { WebhookAction, WebhookRouter } from "@/types/router.type";
 import { appOutputLogger } from "@/utils/log";
 import { bold, cyan, underline } from "colors";
 import express from "express";
 
 export class WebhookServer {
 	private server;
-	private port: number;
 	private gitStatus: IGitStatus;
-	private secret: string | null;
-	constructor(gitStatus: IGitStatus, port: number, secret: string | null) {
-		this.port = port;
+	private config: IConfig;
+
+	constructor(gitStatus: IGitStatus, config: IConfig) {
 		this.gitStatus = gitStatus;
-		this.secret = secret;
+		this.config = config;
 		this.server = express();
 		this.server.use(express.json());
 		this.server.use(express.urlencoded({ extended: true }));
 	}
 
-	useRouter(path: string, handle: WebhookRouter): WebhookServer {
-		this.server.post(path, handle(this.secret));
+	useRouter(webhookRouter: WebhookRouter): WebhookServer {
+		this.server.post("/", (req, res, next) => {
+			webhookRouter(this.config.SECRET);
+			next();
+		});
 		return this;
 	}
 
-	useEvent(event: WebhookEvent) {
-		this.server.post("/", (req, res) => {
+	useAction(event: WebhookAction) {
+		this.server.post("/", (req, res, next) => {
 			const header = req.headers as unknown as IGithubWebhookRequestHeader;
 			const payload = req.body as IGithubWebhookPayload;
-			event(header, payload);
+			event(header, payload, this.gitStatus, this.config);
+			next();
 		});
+		return this;
 	}
 
 	start(): WebhookServer {
-		this.server.get("/", (_req, res) => {
-			res.send("The server is running successfully.");
+		// Builtin Ping-pong router for webhook server.
+		this.server.get("/ping", (_req, res) => {
+			res.send("pong");
 		});
 
-		const LOCALHOST_ADDRESS = `http://localhost:${this.port}`;
+		const LOCALHOST_ADDRESS = `http://localhost:${this.config.PORT}`;
 
 		appOutputLogger.info(`Server started at ${LOCALHOST_ADDRESS}`);
 
@@ -48,7 +54,7 @@ export class WebhookServer {
 		console.log(`${bold("Server PID:")} ${process.pid}, ${bold("Runtime version:")} ${process.version}`);
 		console.log("Next, use reverse proxy (such as nginx) to map your domain name to this address.");
 
-		this.server.listen(this.port);
+		this.server.listen(this.config.PORT);
 
 		return this;
 	}

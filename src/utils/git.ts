@@ -92,21 +92,3 @@ export function pullFromOrigin(_payload: IGithubWebhookPayload) {
 		);
 	}
 }
-
-export function checkGitBranch(payload: IGithubWebhookPayload, GitStatus: IGitStatus) {
-	const masterBranch = payload.repository.master_branch;
-	// Check whether current git branch is master branch.
-	if (GitStatus!.currentBranch !== masterBranch) {
-		throw new GitBranchError(
-			`Current branch ${
-				GitStatus!.currentBranch
-			} is not the default branch. Your should checkout the branch ${masterBranch} manually.`,
-		);
-	}
-	// Check whether the changes received is for master branch.
-	if (payload.ref !== `refs/heads/${masterBranch}` && payload.ref !== masterBranch) {
-		throw new GitBranchError(
-			`Invalid reference: ${payload.ref} is not expected refs/heads/${masterBranch}. So this push event will be ignored.`,
-		);
-	}
-}
