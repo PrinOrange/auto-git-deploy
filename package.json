@@ -13,23 +13,11 @@
 		"lint": "biome lint",
 		"lint:fix": "biome lint --fix .",
 		"clean": "tsx ./scripts/clean.ts",
-		"dev": "bun run ./src/app.ts --watch"
+		"dev": "bun run ./src/app.ts --watch",
+		"alpha-publish": "pnpm publish --tag alpha --access=public"
 	},
-	"files": [
-		"dist/",
-		"README.md",
-		"LICENSE"
-	],
-	"keywords": [
-		"github",
-		"webhook",
-		"auto-deploy",
-		"github-webhook",
-		"deploy",
-		"git",
-		"O&M",
-		"github-api"
-	],
+	"files": ["dist/", "README.md", "LICENSE"],
+	"keywords": ["github", "webhook", "auto-deploy", "github-webhook", "deploy", "git", "O&M", "github-api"],
 	"author": "但为君故",
 	"license": "MIT",
 	"devDependencies": {
