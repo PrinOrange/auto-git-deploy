@@ -3,10 +3,10 @@ dist
 temp
 
 .logs
-.autodeploy
+.autodeployee
 .cache
 
 .DS_Store
 .env
 
-autodeploy.config.json
+autodeployee.config.json
