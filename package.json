@@ -16,7 +16,7 @@
 		"dev": "bun run ./src/app.ts --watch",
 		"alpha-publish": "pnpm publish --tag alpha --access=public"
 	},
-	"files": ["dist/", "README.md", "LICENSE"],
+	"files": ["dist/", "docs/", "README.md", "LICENSE"],
 	"keywords": ["github", "webhook", "auto-deploy", "github-webhook", "deploy", "git", "O&M", "github-api"],
 	"author": "但为君故",
 	"license": "MIT",

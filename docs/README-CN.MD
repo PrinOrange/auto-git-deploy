@@ -1,4 +1,4 @@
-# AUTO-GIT-DEPLOY
+# AUTODEPLOYEE
 
 —— 自动拉取 Github 远程仓库更新并部署。
 
